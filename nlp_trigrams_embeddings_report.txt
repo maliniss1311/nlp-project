@@ -1,0 +1,105 @@
+NLP Lab Report: Trigrams and Word Embeddings
+=============================================
+Natural Language Processing / Computational Linguistics
+Course Assignment — Jurafsky & Martin, Ch. 2, 3, & 6
+
+Dataset: NLTK webtext corpus (wine.txt)
+Train/Test Split: 80% / 20%
+UNK Threshold: minimum frequency = 3
+
+
+1. Number of Processed Sentences
+---------------------------------
+Total sentences after preprocessing: 1,230
+  - Training set: 984
+  - Test set:     246
+
+Preprocessing steps: split on newlines, lowercased, removed punctuation
+using re.findall(r'\w+'), discarded empty lines.
+
+
+2. Interpolated Probability of P(tannins | firm, ripe)
+-------------------------------------------------------
+Using linear interpolation with lambdas = (0.6, 0.3, 0.1):
+
+  P_trigram(tannins | firm, ripe) = 0.000000
+  P_bigram(tannins | ripe)        = 0.085714
+  P_unigram(tannins)              = 0.001492
+
+  P_interpolated = 0.6(0.000000) + 0.3(0.085714) + 0.1(0.001492)
+                 = 0.025864
+
+The trigram "firm ripe tannins" was never observed in training, so the
+MLE trigram probability is zero. Interpolation rescues this by mixing
+in the bigram and unigram evidence: "ripe" is followed by "tannins"
+about 8.6% of the time, which contributes most of the final probability.
+
+
+3. Test-Set Perplexity
+-----------------------
+Test tokens (N): 4,860
+Perplexity (interpolated trigram model): 144.64
+
+The model uses linear interpolation probabilities with a floor of 1e-10
+for any zero-probability events. Perplexity of 144.64 means the model
+is roughly as uncertain as if it were choosing uniformly among ~145
+words at each step — reasonable for a small wine-review corpus.
+
+
+4. Five Word2Vec Nearest Neighbors of "tannins"
+-------------------------------------------------
+Model: Skip-gram, vector_size=100, window=5, min_count=2, epochs=50
+
+  Rank  Word                  Cosine Similarity
+  ----  --------------------  -----------------
+  1     succulent             0.5758
+  2     classy                0.5138
+  3     gives                 0.5050
+  4     evident               0.4977
+  5     softer                0.4888
+
+These neighbors reflect wine-tasting vocabulary: words that describe
+texture, mouthfeel, and structural qualities of wine appear in similar
+contexts as "tannins" and are therefore close in the embedding space.
+
+
+5. Analysis Questions
+----------------------
+
+Q1: Why can a trigram model assign probability zero to a reasonable
+    phrase that was not observed during training?
+
+A trigram model estimates P(w3|w1,w2) directly from counts:
+C(w1,w2,w3) / C(w1,w2). If the specific three-word sequence was never
+seen in training, the count C(w1,w2,w3) = 0, making the probability
+exactly zero — regardless of whether the phrase is linguistically
+reasonable. The model has no mechanism to generalize beyond what it has
+explicitly observed. The space of possible trigrams grows as V^3, so
+even a large training corpus will leave most valid trigrams unseen.
+
+
+Q2: Why does taking log2(0) cause a problem when calculating perplexity?
+
+log2(0) is mathematically undefined (it tends to negative infinity). In
+the perplexity formula, we sum log2 P(wi|context) over all test tokens.
+A single zero-probability token sends the entire sum to negative
+infinity, making the perplexity 2^(+infinity) = infinity. This means
+one unseen trigram can make the model appear infinitely bad, even if it
+predicts every other word well. This is why smoothing techniques or a
+probability floor are essential — they ensure no event receives exactly
+zero probability.
+
+
+Q3: How can Word2Vec identify words related to "tannins" even when a
+    particular word sequence never appeared in the training corpus?
+
+Word2Vec learns dense vector representations by training on local
+context windows, not on specific n-gram sequences. Words that frequently
+appear in similar contexts (e.g., surrounded by words like "firm",
+"dry", "astringent", "oak") are pushed close together in the embedding
+space — even if they never co-occur directly. So "tannins" and a
+related word like "succulent" might both appear near wine-structure
+descriptors, giving them similar vectors. This distributional similarity
+("you shall know a word by the company it keeps" — Firth, 1957) allows
+Word2Vec to capture semantic relationships that count-based n-gram
+models completely miss.

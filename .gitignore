@@ -1,0 +1,8 @@
+# OS / tooling
+.DS_Store
+.cortex/
+__pycache__/
+.ipynb_checkpoints/
+
+# External dataset (separate git repo)
+MedQuAD/

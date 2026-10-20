@@ -1,0 +1,247 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\setlist{nosep,leftmargin=14pt}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{12pt}{4pt}
+\titlespacing*{\subsection}{0pt}{10pt}{3pt}
+
+\hypersetup{colorlinks=true, linkcolor=blue!70!black, citecolor=blue!70!black, urlcolor=blue!70!black}
+
+\begin{document}
+
+\begin{center}
+    {\Large\bfseries Literature Review: Ontology-Grounded LLMs for \\[2pt] Breast Cancer Misinformation Detection}\\[8pt]
+    {\normalsize Meharry Medical College, NLP Course Project \hfill October 2026}
+\end{center}
+\vspace{4pt}
+\hrule
+\vspace{8pt}
+
+\section{Introduction}
+
+This review covers the literature that motivates and informs the Breast Cancer Misinformation Ontology (BCMO). The relevant work falls into four threads: (1) medical fact-checking systems that verify claims against structured knowledge, (2) ontology-constrained biomedical NLP pipelines, (3) studies of how LLMs behave when patients push back with misinformation, and (4) domain adaptation and datasets for patient-facing medical text. We close each subsection by noting what the cited work does not cover and how BCMO fits into the gap.
+
+\section{Medical Fact-Checking via Structured Knowledge}
+
+The idea of checking medical claims against a knowledge base rather than relying on a model's internal memory has picked up considerable traction in the last two years. Zhou et al.\ introduced FAITH at AAAI 2026~\cite{zhou2026faith}, a system that breaks LLM responses into atomic claims, links each one to a medical knowledge graph, and scores them by tracing evidence paths through the graph. FAITH does not need reference answers to work, and it correlates more closely with clinician judgments than text-only evaluation methods. The claim decomposition idea is central to our own approach, though FAITH operates on general medical knowledge graphs that do not capture breast-cancer-specific reasoning like contraindication logic or molecular subtype distinctions.
+
+Barone et al.~\cite{barone2025cer} took a different angle with CER (SIGIR 2025), combining evidence retrieval from the scientific literature with LLM reasoning and a supervised veracity classifier. CER achieved state-of-the-art results on HealthFC, BioASQ-7b, and SciFact, with reasonable cross-dataset generalization. Its strength is in linking claims to published evidence, but it was designed for fact-checking news articles and web pages rather than the informal, often indirect language that patients use in forums and chatbot conversations.
+
+Vladika et al.~\cite{vladika2025atomic} proposed an atomic fact-checking framework specifically for medical question answering. They decompose each LLM response into discrete facts, verify each one independently against an authoritative medical guidelines database, and correct errors at the atomic level. This yielded a 40\% improvement in overall answer quality and caught roughly half of all hallucinations. Their ``atomic facts'' are conceptually similar to our subject-relation-object triples, though we add explicit relation typing and negation modeling that their binary correct/incorrect labels do not capture.
+
+On the retrieval side, Wu et al.\ built MedGraphRAG~\cite{wu2024medgraphrag}, a triple-linked graph that connects patient documents to credible medical sources and controlled vocabularies. Their U-Retrieval mechanism combines top-down precise matching with bottom-up refinement and outperformed previous baselines on 9 medical QA benchmarks and 2 fact-checking benchmarks. The traceable sourcing is valuable, but the underlying knowledge remains general-purpose medical terminology without disease-specific misinformation relations.
+
+Hang et al.~\cite{hang2025trumor} constructed TrumorGPT, which builds semantic health knowledge graphs from medical news and uses GraphRAG to ground fact-checking. It is the closest existing system to what we propose, but with two important differences: TrumorGPT draws on general health news (not curated clinical content), and it has no mechanism for representing negation, uncertainty, or the strength of a medical claim. A patient saying ``chemotherapy probably helps'' is treated the same as one saying ``chemotherapy definitely cures.''
+
+GraphCheck~\cite{chen2025graphcheck} showed that graph neural networks can serve as soft prompts for LLMs, enabling multi-hop reasoning over extracted knowledge graphs in a single inference call. Chen et al.\ reported a 7.1\% improvement over baselines and performance comparable to much larger models. The multi-hop capability is relevant to our work because breast cancer misinformation often requires chaining facts (e.g., TNBC lacks hormone receptors, therefore endocrine therapy is contraindicated, therefore claiming it works is misinformation).
+
+Taken together, these papers establish that structured knowledge verification outperforms LLM-only approaches for medical fact-checking. What none of them do is build a knowledge base tailored to a specific cancer type with relations designed for catching misinformation rather than just answering questions.
+
+\section{Ontology-Constrained Biomedical NLP}
+
+A separate line of work explores how biomedical ontologies can constrain and improve LLM outputs for tasks like relation extraction and knowledge graph construction.
+
+ANCHOR-RE, introduced by Ming et al.\ in August 2026~\cite{ming2026anchor}, is a neuro-symbolic framework that feeds ontology-guided reasoning, external knowledge grounding, and data-driven verification rules into an LLM's inference process. It requires no fine-tuning. On the SemRepGS biomedical relation extraction benchmark, ANCHOR-RE improved F1 from 0.654 to 0.676; on the DDI drug-drug interaction dataset, the jump was more dramatic, from 0.769 to 0.872. It also maintained 69\% precision on articles published in 2026 that the model had never seen during development. This is the most directly relevant methodological paper for our work: it demonstrates that ontology constraints make LLMs more reliable without any parameter updates, which is exactly the mechanism BCMO is designed to provide.
+
+Olasunkanmi et al.~\cite{olasunkanmi2025relate} proposed RELATE, a three-stage pipeline that maps free-text LLM extractions to standardized ontology predicates. The system first embeds ontology predicates, then uses SapBERT-based similarity retrieval, and finally applies LLM reranking with explicit negation handling. On ChemProt, RELATE achieved 94\% accuracy at rank 10 and successfully handled negated assertions while rejecting 0.4\% of irrelevant associations. The negation handling component is especially relevant to breast cancer misinformation, where false claims often take the form of negated truths (``chemotherapy does not work for HER2-positive cancer'').
+
+Ahmed et al.~\cite{ahmed2026chronomedkg} built ChronoMedKG, a temporal biomedical knowledge graph containing 460,000 evidence-linked triples across 13,000+ diseases. Their construction pipeline uses multiple frontier LLMs and only retains relations where the models agree (multi-model consensus). The key finding for our purposes is that KG-based retrieval rescued 47 to 65\% of cases where LLMs gave wrong answers, compared to only 17 to 29\% for standard retrieval-augmented generation. This is among the strongest quantitative arguments that structured knowledge, not just document retrieval, is needed for reliable medical reasoning.
+
+On the cancer-specific side, Karim et al.~\cite{karim2023onconet} constructed the OncoNet Ontology (ONO) for cancer knowledge, populating it with BioBERT and SciBERT extractors and enriching it through LLM fine-tuning on recent literature. ONO is designed for biomarker discovery and gene-disease relation validation. It does not include misinformation-oriented relation types like \texttt{contraindicated\_for} or support for negation and uncertainty modeling. BCMO fills this gap by building a cancer ontology whose relations are chosen specifically for catching common types of patient misinformation.
+
+Wu et al.~\cite{wu2025cloze} demonstrated with CLOZE that LLMs can extend medical ontologies in a zero-shot setting by extracting entities from clinical notes and placing them in ontological hierarchies without any labeled training data. This is relevant to the scalability of our approach: BCMO currently uses regex-based extraction, but LLM-based methods could expand the ontology to new drugs, subtypes, or guidelines as they emerge.
+
+\section{LLM Behavior on Patient Misinformation}
+
+A growing body of work examines how LLMs handle misinformation in medical conversations, and the results are not reassuring.
+
+Munnangi and Savage~\cite{munnangi2026threadmedqa} collected ThReadMed-QA, a dataset of 2,437 real patient-physician threads (8,204 QA pairs) from the AskDocs subreddit. They tested whether LLMs could detect and correct misconceptions embedded in patient questions over multiple conversation turns. GPT-5 and Claude-Haiku corrected false presuppositions about 85\% of the time on the first exchange, but accuracy dropped to roughly 50\% within two follow-up turns. Error propagation turned out to be the dominant failure mode: once a model accepted a flawed premise, it built subsequent answers on top of it. This multi-turn degradation is exactly the kind of problem that a stable external ontology should address, since the ontology's facts do not shift based on conversational pressure.
+
+Ping et al.~\cite{ping2026sycophancy} studied the same phenomenon from a different angle, running a large factorial experiment (4 conversational factors, 5 models, 500 MedQuAD questions, totaling 1.2 million trials) to understand when and why LLMs abandon correct medical answers under user pushback. They found that fabricated citations accompanying a wrong claim doubled the sycophancy rate. More interestingly, models whose chain-of-thought traces showed reasoning about medical facts resisted pressure better than models that re-examined their own previous answers. The implication for our work is that grounding verification in an external ontology (rather than asking the model to self-check) should produce more stable outputs.
+
+Jeong et al.~\cite{jeong2024limited} reported a sobering finding at EMNLP 2024: domain-adapted medical LLMs actually performed worse than their base counterparts in 56.7\% of clinical QA scenarios. Medical fine-tuning, on its own, is not a reliable path to better medical reasoning. This supports the argument for external structured knowledge like BCMO as a complement to (or substitute for) domain adaptation.
+
+\section{Domain Adaptation and Patient Language}
+
+Patient-generated text presents challenges that standard biomedical NLP tools are not built for. Forum posts and chatbot conversations use colloquial language, abbreviations, and personal narratives that differ substantially from the clinical and scientific text these tools were trained on.
+
+Fodeh et al.~\cite{fodeh2026pvminer} developed PVminer, a suite of domain-adapted BERT models (PV-BERT) trained specifically on patient voice data from secure messaging systems. Their multi-label classifier achieved an F1 of 82.25\% on patient communication coding, outperforming both generic and biomedical-specific baselines. This confirms that patient language is its own domain requiring its own adaptation, distinct from clinical notes or journal articles.
+
+Hassan et al.~\cite{hassan2025ragft} showed that combining retrieval-augmented generation with fine-tuning (RAG + FT) on LLaMA-2 raised PubMedQA accuracy from 55.4\% to 71.8\% and reduced unsupported content by about 60\%. RAG clearly helps, but their system still operates on flat document retrieval without the structured relational reasoning an ontology provides. Our hypothesis is that ontology grounding adds a layer of logical checking (e.g., domain/range constraints, contraindication inference) that RAG alone cannot offer.
+
+\section{Key Datasets}
+
+Several datasets have been developed for medical fact-checking and are relevant as benchmarks or data sources for our work:
+
+\begin{itemize}
+    \item \textbf{MedQuAD}~\cite{benabacha2019}: 47,457 QA pairs from 12 NIH websites. Our primary data source for ontology construction.
+    \item \textbf{HealthFC}~\cite{vladika2024healthfc}: 750 health claims (bilingual) fact-checked by medical experts against systematic review evidence. Potential evaluation benchmark.
+    \item \textbf{FactKG}~\cite{kim2023factkg}: 108,000 claims requiring five reasoning types (one-hop, conjunction, existence, multi-hop, negation). Establishes the taxonomy of reasoning needed for knowledge-graph-based verification.
+    \item \textbf{CoVERT}~\cite{mohr2022covert}: 300 COVID-19 tweets annotated with medical entities, relations, and fact-checking labels. Demonstrates that real-world evidence retrieval outperforms parametric model knowledge for social media health claims.
+    \item \textbf{CancerMyth}: 585 adversarial breast cancer questions with false presuppositions plus 150 control questions. The primary evaluation benchmark for our misinformation detection pipeline.
+\end{itemize}
+
+\section{Summary and Gaps}
+
+Table~\ref{tab:gaps} summarizes the landscape and identifies the gap BCMO occupies.
+
+\begin{table}[h]
+    \centering
+    \small
+    \caption{Related work and the gap BCMO fills.}
+    \label{tab:gaps}
+    \vspace{2pt}
+    \begin{tabular}{@{}p{4cm}p{9cm}@{}}
+        \toprule
+        \textbf{Existing Work} & \textbf{What It Does Not Cover} \\
+        \midrule
+        FAITH, GraphCheck, TrumorGPT
+            & Use general medical KGs; none builds a domain-specific misinformation ontology for breast cancer \\[4pt]
+        ANCHOR-RE, RELATE
+            & Target scientific literature extraction; do not handle informal patient language or forum-style misconceptions \\[4pt]
+        CER, HealthFC
+            & Verify factual claims from news and web sources; do not address implicit misinformation embedded in patient questions \\[4pt]
+        OncoNet (Karim et al.)
+            & Cancer KG for biomarker discovery; lacks misinformation-specific relations like \texttt{contraindicated\_for} \\[4pt]
+        MedGraphRAG, ChronoMedKG
+            & General medical graph structures; do not model negation, uncertainty, or the strength of a medical claim \\[4pt]
+        ThReadMed-QA, Medical Sycophancy
+            & Identify the problem (LLMs fail on patient misinformation) but do not propose structured verification solutions \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The core gap is this: no existing system combines a domain-specific breast cancer ontology, misinformation-targeted relation types (including contraindication, negation, and certainty modeling), and structured claim verification designed for the way patients actually talk about their disease. BCMO is built to occupy that space.
+
+Five methodological lessons from this literature guided our design:
+
+\begin{enumerate}
+    \item \textbf{Claim decomposition works.} Multiple papers (FAITH, Vladika et al.) show that breaking text into atomic verifiable units improves accuracy by 40\% or more.
+    \item \textbf{Structured knowledge beats flat retrieval.} ChronoMedKG found that KG retrieval rescued 47 to 65\% of LLM failures, compared to 17 to 29\% for standard RAG.
+    \item \textbf{Negation handling is not optional.} Medical misinformation frequently involves negated or overstated claims. RELATE's explicit negation pipeline and FactKG's negation reasoning type both underscore this.
+    \item \textbf{LLMs degrade under pressure.} ThReadMed-QA's 85\% to 50\% accuracy drop over two turns, and the sycophancy findings of Ping et al., show that LLMs need external grounding to stay reliable in multi-turn patient conversations.
+    \item \textbf{Patient language is its own domain.} PVminer showed that models trained on clinical or biomedical text underperform on patient-generated content. Any system targeting patient misinformation must account for this gap.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════
+\newpage
+
+\begin{thebibliography}{20}
+\small
+\setlength{\itemsep}{2pt}
+\setlength{\parskip}{0pt}
+
+\bibitem{zhou2026faith}
+Zhou, K., Huang, Y., Cole, T., Britton, J., Yin, Z., Wolber, M., and Li, J. (2026).
+Assessing Automated Fact-Checking for Medical LLM Responses with Knowledge Graphs.
+\textit{AAAI 2026}. arXiv:2511.12817.
+
+\bibitem{barone2025cer}
+Barone, F., Romano, L., Riccio, D., Postiglione, M., and Moscato, V. (2025).
+Combating Biomedical Misinformation through Multi-modal Claim Detection and Evidence-Based Verification.
+\textit{SIGIR 2025}. arXiv:2509.13888.
+
+\bibitem{vladika2025atomic}
+Vladika, J., Domres, M., Nguyen, T., et al. (2025).
+Improving Reliability and Explainability of Medical QA through Atomic Fact Checking in Retrieval-Augmented LLMs.
+arXiv:2505.24830.
+
+\bibitem{wu2024medgraphrag}
+Wu, J., Zhu, Z., Qi, Y., Chen, J., Xu, J., Menolascina, F., and Grau, B. (2024).
+Medical Graph RAG: Towards Safe Medical Large Language Model via Graph Retrieval-Augmented Generation.
+arXiv:2408.04187.
+
+\bibitem{hang2025trumor}
+Hang, C., Yu, P., and Tan, T. (2025).
+TrumorGPT: Graph-Based Retrieval-Augmented Large Language Model for Fact-Checking.
+arXiv:2505.07891.
+
+\bibitem{chen2025graphcheck}
+Chen, Z., et al. (2025).
+GraphCheck: Breaking Long-Term Text Barriers with Extracted Knowledge Graph-Powered Fact-Checking.
+arXiv:2502.16514.
+
+\bibitem{ming2026anchor}
+Ming, D., Han, L., Hong, Y., Zhang, R., and Kilicoglu, H. (2026).
+ANCHOR-RE: An Agentic Neuro-Symbolic Framework for Grounded Biomedical Relation Extraction.
+arXiv:2608.03154.
+
+\bibitem{olasunkanmi2025relate}
+Olasunkanmi, O., Satusky, M., Yi, E., Bizon, C., Lee, K., and Ahalt, S. (2025).
+RELATE: Relation Extraction in Biomedical Abstracts with LLMs and Ontology Constraints.
+arXiv:2509.19057.
+
+\bibitem{ahmed2026chronomedkg}
+Ahmed, M., Firoozbakht, F., Galke, L., Poech, B., Baumbach, J., and R\"{o}ttger, P. (2026).
+ChronoMedKG: A Temporally-Grounded Biomedical Knowledge Graph for Clinical Reasoning.
+arXiv:2605.22734.
+
+\bibitem{karim2023onconet}
+Karim, M., Molinas Comet, R., Shajalal, M., Beyan, O., Rebholz-Schuhmann, D., and Decker, S. (2023).
+From Large Language Models to Knowledge Graphs for Biomarker Discovery in Cancer.
+arXiv:2310.08365.
+
+\bibitem{wu2025cloze}
+Wu, Y., Xie, Z., Wu, Y., He, Y., Shao, J., Hu, B., and Yang, X. (2025).
+Utilizing LLMs for Zero-Shot Medical Ontology Extension from Clinical Notes.
+\textit{BIBM 2025 Workshop}. arXiv:2511.16548.
+
+\bibitem{munnangi2026threadmedqa}
+Munnangi, S. and Savage, S. (2026).
+Evaluating LLMs on Misconceptions in Multi-Turn Medical Conversations.
+\textit{MLHC 2026}. arXiv:2607.12884.
+
+\bibitem{ping2026sycophancy}
+Ping, Q., \c{C}ar{\i}k, B., Wohn, D., Ding, Y., Wang, X., and Rho, E. (2026).
+Why LLMs Give In: Conversational Factors and Reasoning Behind Medical Sycophancy.
+arXiv:2608.01017.
+
+\bibitem{jeong2024limited}
+Jeong, M., Mani, K., Garg, S., Lipton, Z., and Oberst, M. (2024).
+The Limited Impact of Medical Adaptation of Large Language Models.
+\textit{EMNLP 2024}. arXiv:2411.08870.
+
+\bibitem{fodeh2026pvminer}
+Fodeh, S., et al. (2026).
+PVminer: Domain-Adapted NLP for Patient Voice in Secure Messages.
+arXiv:2602.21165.
+
+\bibitem{hassan2025ragft}
+Hassan, T., et al. (2025).
+RAG + Fine-Tuning for Medical QA.
+arXiv:2512.05863.
+
+\bibitem{benabacha2019}
+Ben Abacha, A. and Demner-Fushman, D. (2019).
+A Question-Entailment Approach to Question Answering.
+\textit{BMC Bioinformatics}, 20(511).
+
+\bibitem{vladika2024healthfc}
+Vladika, J., Schneider, P., and Matthes, F. (2024).
+HealthFC: Verifying Health Claims with Evidence-Based Medical Fact-Checking.
+\textit{LREC-COLING 2024}. arXiv:2309.08503.
+
+\bibitem{kim2023factkg}
+Kim, J., Park, S., Kwon, Y., Jo, Y., Thorne, J., and Choi, E. (2023).
+FactKG: Fact Verification via Reasoning on Knowledge Graphs.
+\textit{ACL 2023}. arXiv:2305.06590.
+
+\bibitem{mohr2022covert}
+Mohr, I., W\"{u}hrl, A., and Klinger, R. (2022).
+CoVERT: A Corpus of Fact-Checked Biomedical COVID-19 Tweets.
+\textit{LREC 2022}. arXiv:2204.12164.
+
+\end{thebibliography}
+
+\end{document}

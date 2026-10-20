@@ -1,0 +1,1877 @@
+{
+  "ontology_metadata": {
+    "name": "Breast Cancer Misinformation Ontology",
+    "acronym": "BCMO",
+    "version": "1.0",
+    "created": "2026-09-23T19:55:31.167995",
+    "description": "A compact, purpose-built ontology for detecting misinformation in breast cancer patient conversations. Combines concepts from NCI Thesaurus, UMLS, MedQuAD Cancer.gov, and clinical guidelines.",
+    "concept_class_count": 16,
+    "relation_type_count": 12,
+    "sources": [
+      "NCI Thesaurus",
+      "UMLS Metathesaurus",
+      "MedQuAD Cancer.gov QA pairs (Ben Abacha & Demner-Fushman, 2019)",
+      "NCCN Clinical Practice Guidelines in Oncology: Breast Cancer",
+      "American Cancer Society"
+    ],
+    "license": "CC BY 4.0 (ontology structure); underlying data sources retain their original licenses"
+  },
+  "concept_classes": {
+    "BreastCancer": {
+      "description": "The primary disease entity",
+      "umls_cui": "C0006142",
+      "nci_code": "C4872",
+      "instances": [
+        "Breast Cancer"
+      ]
+    },
+    "BreastCancerSubtype": {
+      "description": "Histological and molecular subtypes of breast cancer",
+      "instances": [
+        {
+          "name": "Invasive Ductal Carcinoma",
+          "aliases": [
+            "IDC",
+            "ductal carcinoma",
+            "infiltrating ductal carcinoma"
+          ],
+          "umls_cui": "C0007124",
+          "description": "Most common type (~70-80% of breast cancers), begins in milk duct lining"
+        },
+        {
+          "name": "Invasive Lobular Carcinoma",
+          "aliases": [
+            "ILC",
+            "lobular carcinoma"
+          ],
+          "umls_cui": "C0279565",
+          "description": "Second most common type (~10-15%), begins in milk-producing lobules"
+        },
+        {
+          "name": "Ductal Carcinoma In Situ",
+          "aliases": [
+            "DCIS"
+          ],
+          "umls_cui": "C0007124",
+          "description": "Non-invasive; abnormal cells in duct lining have not spread. Stage 0."
+        },
+        {
+          "name": "Lobular Carcinoma In Situ",
+          "aliases": [
+            "LCIS"
+          ],
+          "umls_cui": "C0279563",
+          "description": "Abnormal cells in lobules; increases risk but seldom becomes invasive"
+        },
+        {
+          "name": "Inflammatory Breast Cancer",
+          "aliases": [
+            "IBC"
+          ],
+          "umls_cui": "C0278601",
+          "description": "Rare, aggressive; breast is warm, red, swollen. Cancer cells block lymph vessels."
+        },
+        {
+          "name": "Triple-Negative Breast Cancer",
+          "aliases": [
+            "TNBC",
+            "triple negative"
+          ],
+          "umls_cui": "C3539878",
+          "description": "ER-negative, PR-negative, HER2-negative. No targeted hormone/HER2 therapy available."
+        },
+        {
+          "name": "HER2-Positive Breast Cancer",
+          "aliases": [
+            "HER2+"
+          ],
+          "description": "Overexpresses HER2 protein. Responds to HER2-targeted therapies."
+        },
+        {
+          "name": "Hormone Receptor-Positive Breast Cancer",
+          "aliases": [
+            "HR+",
+            "ER+/PR+"
+          ],
+          "description": "ER-positive and/or PR-positive. Responds to endocrine therapy."
+        },
+        {
+          "name": "Paget Disease of the Nipple",
+          "aliases": [
+            "Paget's disease"
+          ],
+          "umls_cui": "C0030185",
+          "description": "Rare form affecting nipple skin, often associated with underlying DCIS or invasive cancer"
+        },
+        {
+          "name": "Metastatic Breast Cancer",
+          "aliases": [
+            "Stage IV breast cancer",
+            "advanced breast cancer"
+          ],
+          "description": "Cancer that has spread to distant organs (bones, lungs, liver, brain)"
+        }
+      ]
+    },
+    "StageAndGrade": {
+      "description": "Cancer staging (TNM) and histologic grading",
+      "instances": [
+        {
+          "name": "Stage 0",
+          "aliases": [
+            "carcinoma in situ"
+          ],
+          "description": "Non-invasive (DCIS, LCIS, Paget)"
+        },
+        {
+          "name": "Stage I",
+          "aliases": [
+            "Stage IA",
+            "Stage IB"
+          ],
+          "description": "Small tumor (<=2cm), little or no lymph node involvement"
+        },
+        {
+          "name": "Stage II",
+          "aliases": [
+            "Stage IIA",
+            "Stage IIB"
+          ],
+          "description": "Larger tumor or limited lymph node spread"
+        },
+        {
+          "name": "Stage III",
+          "aliases": [
+            "Stage IIIA",
+            "Stage IIIB",
+            "Stage IIIC",
+            "locally advanced"
+          ],
+          "description": "Extensive local/regional disease"
+        },
+        {
+          "name": "Stage IV",
+          "aliases": [
+            "metastatic"
+          ],
+          "description": "Distant metastasis"
+        },
+        {
+          "name": "Grade 1",
+          "aliases": [
+            "low grade",
+            "well differentiated"
+          ],
+          "description": "Slow-growing, resembles normal cells"
+        },
+        {
+          "name": "Grade 2",
+          "aliases": [
+            "intermediate grade",
+            "moderately differentiated"
+          ],
+          "description": "Intermediate growth rate"
+        },
+        {
+          "name": "Grade 3",
+          "aliases": [
+            "high grade",
+            "poorly differentiated"
+          ],
+          "description": "Fast-growing, looks very different from normal cells"
+        }
+      ]
+    },
+    "Symptom": {
+      "description": "Signs and symptoms of breast cancer",
+      "instances": [
+        {
+          "name": "Breast lump",
+          "aliases": [
+            "lump",
+            "mass",
+            "thickening"
+          ]
+        },
+        {
+          "name": "Nipple discharge",
+          "aliases": [
+            "fluid from nipple",
+            "bloody discharge"
+          ]
+        },
+        {
+          "name": "Nipple inversion",
+          "aliases": [
+            "nipple turned inward",
+            "retracted nipple"
+          ]
+        },
+        {
+          "name": "Skin dimpling",
+          "aliases": [
+            "dimple",
+            "puckering",
+            "peau d'orange"
+          ]
+        },
+        {
+          "name": "Breast skin changes",
+          "aliases": [
+            "scaly skin",
+            "red skin",
+            "swollen skin"
+          ]
+        },
+        {
+          "name": "Breast size change",
+          "aliases": [
+            "change in size",
+            "change in shape"
+          ]
+        },
+        {
+          "name": "Breast pain",
+          "aliases": [
+            "mastalgia"
+          ]
+        },
+        {
+          "name": "Axillary lymphadenopathy",
+          "aliases": [
+            "swollen lymph nodes",
+            "underarm lump"
+          ]
+        },
+        {
+          "name": "Fatigue",
+          "aliases": [
+            "tiredness",
+            "feeling tired"
+          ]
+        },
+        {
+          "name": "Bone pain",
+          "description": "May indicate metastasis"
+        },
+        {
+          "name": "Weight loss",
+          "aliases": [
+            "unexplained weight loss"
+          ]
+        }
+      ]
+    },
+    "RiskFactor": {
+      "description": "Factors that increase breast cancer risk",
+      "instances": [
+        {
+          "name": "Family history of breast cancer",
+          "aliases": [
+            "family history"
+          ],
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "BRCA1/BRCA2 mutation",
+          "aliases": [
+            "BRCA mutation",
+            "hereditary breast cancer"
+          ],
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "Older age",
+          "aliases": [
+            "age",
+            "aging"
+          ],
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "Dense breast tissue",
+          "aliases": [
+            "dense breasts"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Obesity",
+          "aliases": [
+            "overweight",
+            "BMI"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Alcohol consumption",
+          "aliases": [
+            "drinking alcohol"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Hormone replacement therapy",
+          "aliases": [
+            "HRT",
+            "estrogen + progestin"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Early menstruation",
+          "aliases": [
+            "menarche before 12"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Late menopause",
+          "aliases": [
+            "menopause after 55"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Nulliparity",
+          "aliases": [
+            "never having given birth"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Previous radiation to chest",
+          "aliases": [
+            "radiation exposure"
+          ],
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "Personal history of breast cancer",
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "Sedentary lifestyle",
+          "aliases": [
+            "lack of exercise"
+          ],
+          "evidence_strength": "moderate"
+        }
+      ]
+    },
+    "ProtectiveFactor": {
+      "description": "Factors that decrease breast cancer risk",
+      "instances": [
+        {
+          "name": "Regular exercise",
+          "aliases": [
+            "physical activity"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Breastfeeding",
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Early pregnancy",
+          "aliases": [
+            "first pregnancy before 30"
+          ],
+          "evidence_strength": "moderate"
+        },
+        {
+          "name": "Prophylactic mastectomy",
+          "aliases": [
+            "risk-reducing mastectomy"
+          ],
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "Prophylactic oophorectomy",
+          "aliases": [
+            "ovarian ablation",
+            "risk-reducing oophorectomy"
+          ],
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "Selective estrogen receptor modulators",
+          "aliases": [
+            "SERMs",
+            "tamoxifen for prevention"
+          ],
+          "evidence_strength": "strong"
+        },
+        {
+          "name": "Aromatase inhibitors for prevention",
+          "evidence_strength": "strong"
+        }
+      ]
+    },
+    "GeneticFactor": {
+      "description": "Genes and mutations associated with breast cancer",
+      "instances": [
+        {
+          "name": "BRCA1",
+          "umls_cui": "C0376571",
+          "description": "Tumor suppressor gene; mutations increase breast/ovarian cancer risk to 45-72%"
+        },
+        {
+          "name": "BRCA2",
+          "umls_cui": "C0376572",
+          "description": "Tumor suppressor gene; mutations increase breast cancer risk to 45-69%"
+        },
+        {
+          "name": "TP53",
+          "aliases": [
+            "Li-Fraumeni syndrome"
+          ],
+          "description": "Rare; increases risk of multiple cancers including breast"
+        },
+        {
+          "name": "PALB2",
+          "description": "Partner of BRCA2; moderate-to-high risk gene"
+        },
+        {
+          "name": "ATM",
+          "description": "Moderate-risk breast cancer gene"
+        },
+        {
+          "name": "CHEK2",
+          "description": "Moderate-risk breast cancer gene"
+        }
+      ]
+    },
+    "Biomarker": {
+      "description": "Molecular markers used for diagnosis, prognosis, and treatment selection",
+      "instances": [
+        {
+          "name": "Estrogen Receptor",
+          "aliases": [
+            "ER",
+            "ER+",
+            "ER-"
+          ],
+          "umls_cui": "C0034804"
+        },
+        {
+          "name": "Progesterone Receptor",
+          "aliases": [
+            "PR",
+            "PR+",
+            "PR-",
+            "PgR"
+          ],
+          "umls_cui": "C0034833"
+        },
+        {
+          "name": "HER2/neu",
+          "aliases": [
+            "HER2",
+            "ERBB2",
+            "HER2+",
+            "HER2-"
+          ],
+          "umls_cui": "C0069515"
+        },
+        {
+          "name": "Ki-67",
+          "description": "Proliferation marker; higher values indicate faster-growing cancer"
+        },
+        {
+          "name": "Oncotype DX",
+          "description": "21-gene recurrence score; guides chemotherapy decisions in HR+/HER2- early breast cancer"
+        },
+        {
+          "name": "MammaPrint",
+          "description": "70-gene signature; predicts recurrence risk in early-stage breast cancer"
+        },
+        {
+          "name": "PD-L1",
+          "description": "Immune checkpoint marker; guides immunotherapy decisions in TNBC"
+        }
+      ]
+    },
+    "DiagnosticTest": {
+      "description": "Tests used to detect and diagnose breast cancer",
+      "instances": [
+        {
+          "name": "Mammogram",
+          "aliases": [
+            "mammography"
+          ],
+          "description": "X-ray imaging of the breast; primary screening tool"
+        },
+        {
+          "name": "Breast Ultrasound",
+          "aliases": [
+            "ultrasound",
+            "sonogram"
+          ],
+          "description": "Uses sound waves; often used with mammography for dense breasts"
+        },
+        {
+          "name": "Breast MRI",
+          "aliases": [
+            "MRI"
+          ],
+          "description": "Magnetic resonance imaging; used for high-risk screening"
+        },
+        {
+          "name": "Biopsy",
+          "aliases": [
+            "core biopsy",
+            "needle biopsy",
+            "excisional biopsy"
+          ],
+          "description": "Tissue removal for pathological examination"
+        },
+        {
+          "name": "Fine-Needle Aspiration",
+          "aliases": [
+            "FNA",
+            "FNA biopsy"
+          ]
+        },
+        {
+          "name": "Sentinel Lymph Node Biopsy",
+          "aliases": [
+            "SLNB"
+          ],
+          "description": "Checks if cancer has spread to lymph nodes"
+        },
+        {
+          "name": "Clinical Breast Exam",
+          "aliases": [
+            "CBE"
+          ],
+          "description": "Physical examination by healthcare provider"
+        },
+        {
+          "name": "PET Scan",
+          "aliases": [
+            "PET/CT"
+          ],
+          "description": "Detects metabolically active cancer cells"
+        },
+        {
+          "name": "CT Scan",
+          "aliases": [
+            "CAT scan"
+          ],
+          "description": "Cross-sectional imaging for staging"
+        },
+        {
+          "name": "Bone Scan",
+          "description": "Checks for bone metastasis"
+        },
+        {
+          "name": "Genetic Testing",
+          "aliases": [
+            "BRCA testing"
+          ],
+          "description": "Tests for hereditary cancer gene mutations"
+        },
+        {
+          "name": "Immunohistochemistry",
+          "aliases": [
+            "IHC"
+          ],
+          "description": "Tests ER, PR, HER2 status on tissue samples"
+        },
+        {
+          "name": "FISH Test",
+          "aliases": [
+            "fluorescence in situ hybridization"
+          ],
+          "description": "Confirms HER2 gene amplification"
+        }
+      ]
+    },
+    "Treatment": {
+      "description": "Therapeutic interventions for breast cancer",
+      "instances": [
+        {
+          "name": "Surgery",
+          "subcategories": [
+            "Lumpectomy",
+            "Mastectomy",
+            "Breast reconstruction"
+          ]
+        },
+        {
+          "name": "Lumpectomy",
+          "aliases": [
+            "breast-conserving surgery",
+            "partial mastectomy"
+          ],
+          "description": "Removes tumor and margin of normal tissue"
+        },
+        {
+          "name": "Mastectomy",
+          "aliases": [
+            "total mastectomy",
+            "modified radical mastectomy"
+          ],
+          "description": "Removes entire breast"
+        },
+        {
+          "name": "Chemotherapy",
+          "aliases": [
+            "chemo"
+          ],
+          "description": "Systemic drug treatment that kills rapidly dividing cells"
+        },
+        {
+          "name": "Radiation Therapy",
+          "aliases": [
+            "radiotherapy",
+            "radiation"
+          ],
+          "description": "High-energy rays to kill cancer cells in a specific area"
+        },
+        {
+          "name": "Endocrine Therapy",
+          "aliases": [
+            "hormone therapy",
+            "hormonal therapy"
+          ],
+          "description": "Blocks hormones that fuel HR+ breast cancer growth"
+        },
+        {
+          "name": "Targeted Therapy",
+          "description": "Drugs targeting specific molecular features (e.g., HER2)"
+        },
+        {
+          "name": "Immunotherapy",
+          "aliases": [
+            "immune checkpoint inhibitor"
+          ],
+          "description": "Stimulates immune system to attack cancer cells"
+        },
+        {
+          "name": "Neoadjuvant Therapy",
+          "description": "Treatment given before surgery to shrink tumors"
+        },
+        {
+          "name": "Adjuvant Therapy",
+          "description": "Treatment given after surgery to reduce recurrence risk"
+        },
+        {
+          "name": "Stem Cell Transplant",
+          "aliases": [
+            "bone marrow transplant"
+          ],
+          "description": "Replaces blood-forming cells after high-dose chemotherapy"
+        }
+      ]
+    },
+    "Medication": {
+      "description": "Specific drugs used in breast cancer treatment",
+      "instances": [
+        {
+          "name": "Tamoxifen",
+          "class": "SERM",
+          "target": "ER",
+          "used_for": [
+            "HR+ breast cancer",
+            "prevention"
+          ]
+        },
+        {
+          "name": "Anastrozole",
+          "aliases": [
+            "Arimidex"
+          ],
+          "class": "Aromatase Inhibitor",
+          "target": "estrogen synthesis"
+        },
+        {
+          "name": "Letrozole",
+          "aliases": [
+            "Femara"
+          ],
+          "class": "Aromatase Inhibitor",
+          "target": "estrogen synthesis"
+        },
+        {
+          "name": "Exemestane",
+          "aliases": [
+            "Aromasin"
+          ],
+          "class": "Aromatase Inhibitor",
+          "target": "estrogen synthesis"
+        },
+        {
+          "name": "Trastuzumab",
+          "aliases": [
+            "Herceptin"
+          ],
+          "class": "Monoclonal Antibody",
+          "target": "HER2"
+        },
+        {
+          "name": "Pertuzumab",
+          "aliases": [
+            "Perjeta"
+          ],
+          "class": "Monoclonal Antibody",
+          "target": "HER2"
+        },
+        {
+          "name": "T-DM1",
+          "aliases": [
+            "Kadcyla",
+            "ado-trastuzumab emtansine"
+          ],
+          "class": "Antibody-Drug Conjugate",
+          "target": "HER2"
+        },
+        {
+          "name": "Trastuzumab Deruxtecan",
+          "aliases": [
+            "Enhertu",
+            "T-DXd"
+          ],
+          "class": "Antibody-Drug Conjugate",
+          "target": "HER2"
+        },
+        {
+          "name": "Palbociclib",
+          "aliases": [
+            "Ibrance"
+          ],
+          "class": "CDK4/6 Inhibitor",
+          "target": "cell cycle"
+        },
+        {
+          "name": "Ribociclib",
+          "aliases": [
+            "Kisqali"
+          ],
+          "class": "CDK4/6 Inhibitor",
+          "target": "cell cycle"
+        },
+        {
+          "name": "Pembrolizumab",
+          "aliases": [
+            "Keytruda"
+          ],
+          "class": "PD-1 Inhibitor",
+          "target": "PD-1",
+          "used_for": [
+            "TNBC"
+          ]
+        },
+        {
+          "name": "Olaparib",
+          "aliases": [
+            "Lynparza"
+          ],
+          "class": "PARP Inhibitor",
+          "target": "DNA repair",
+          "used_for": [
+            "BRCA-mutated breast cancer"
+          ]
+        }
+      ]
+    },
+    "SideEffect": {
+      "description": "Adverse effects of breast cancer treatments",
+      "instances": [
+        {
+          "name": "Nausea and vomiting",
+          "associated_treatments": [
+            "Chemotherapy"
+          ]
+        },
+        {
+          "name": "Hair loss",
+          "aliases": [
+            "alopecia"
+          ],
+          "associated_treatments": [
+            "Chemotherapy"
+          ]
+        },
+        {
+          "name": "Fatigue",
+          "associated_treatments": [
+            "Chemotherapy",
+            "Radiation Therapy",
+            "Endocrine Therapy"
+          ]
+        },
+        {
+          "name": "Neutropenia",
+          "aliases": [
+            "low white blood cells"
+          ],
+          "associated_treatments": [
+            "Chemotherapy"
+          ]
+        },
+        {
+          "name": "Neuropathy",
+          "aliases": [
+            "peripheral neuropathy",
+            "numbness",
+            "tingling"
+          ],
+          "associated_treatments": [
+            "Chemotherapy"
+          ]
+        },
+        {
+          "name": "Lymphedema",
+          "aliases": [
+            "arm swelling"
+          ],
+          "associated_treatments": [
+            "Surgery",
+            "Radiation Therapy"
+          ]
+        },
+        {
+          "name": "Hot flashes",
+          "associated_treatments": [
+            "Endocrine Therapy",
+            "Tamoxifen"
+          ]
+        },
+        {
+          "name": "Joint pain",
+          "aliases": [
+            "arthralgia"
+          ],
+          "associated_treatments": [
+            "Aromatase Inhibitor"
+          ]
+        },
+        {
+          "name": "Bone loss",
+          "aliases": [
+            "osteoporosis"
+          ],
+          "associated_treatments": [
+            "Aromatase Inhibitor"
+          ]
+        },
+        {
+          "name": "Cardiotoxicity",
+          "aliases": [
+            "heart damage"
+          ],
+          "associated_treatments": [
+            "Trastuzumab",
+            "Doxorubicin"
+          ]
+        },
+        {
+          "name": "Skin irritation",
+          "aliases": [
+            "radiation dermatitis"
+          ],
+          "associated_treatments": [
+            "Radiation Therapy"
+          ]
+        },
+        {
+          "name": "Cognitive changes",
+          "aliases": [
+            "chemo brain",
+            "brain fog"
+          ],
+          "associated_treatments": [
+            "Chemotherapy"
+          ]
+        },
+        {
+          "name": "Infertility",
+          "associated_treatments": [
+            "Chemotherapy",
+            "Endocrine Therapy"
+          ]
+        }
+      ]
+    },
+    "Recurrence": {
+      "description": "Return of cancer after treatment",
+      "instances": [
+        {
+          "name": "Local recurrence",
+          "description": "Cancer returns in the same breast or chest wall"
+        },
+        {
+          "name": "Regional recurrence",
+          "description": "Cancer returns in nearby lymph nodes"
+        },
+        {
+          "name": "Distant recurrence",
+          "aliases": [
+            "metastatic recurrence"
+          ],
+          "description": "Cancer returns in distant organs"
+        }
+      ]
+    },
+    "Metastasis": {
+      "description": "Spread of cancer to distant sites",
+      "instances": [
+        {
+          "name": "Bone metastasis",
+          "aliases": [
+            "bone mets"
+          ],
+          "description": "Most common site of breast cancer metastasis"
+        },
+        {
+          "name": "Lung metastasis",
+          "aliases": [
+            "lung mets"
+          ]
+        },
+        {
+          "name": "Liver metastasis",
+          "aliases": [
+            "liver mets"
+          ]
+        },
+        {
+          "name": "Brain metastasis",
+          "aliases": [
+            "brain mets"
+          ]
+        }
+      ]
+    },
+    "PreventionAndScreening": {
+      "description": "Prevention strategies and screening guidelines",
+      "instances": [
+        {
+          "name": "Mammography screening",
+          "description": "Recommended annually or biennially starting at age 40-50 depending on guidelines"
+        },
+        {
+          "name": "Breast self-exam",
+          "aliases": [
+            "BSE"
+          ],
+          "description": "Self-examination to detect changes"
+        },
+        {
+          "name": "Genetic counseling",
+          "description": "Recommended for high-risk individuals"
+        },
+        {
+          "name": "Risk-reducing surgery",
+          "aliases": [
+            "prophylactic mastectomy",
+            "prophylactic oophorectomy"
+          ]
+        },
+        {
+          "name": "Chemoprevention",
+          "aliases": [
+            "tamoxifen prevention",
+            "SERM prevention"
+          ]
+        }
+      ]
+    }
+  },
+  "relation_types": {
+    "treats": {
+      "description": "Treatment X is used to treat condition Y",
+      "domain": [
+        "Treatment",
+        "Medication"
+      ],
+      "range": [
+        "BreastCancer",
+        "BreastCancerSubtype",
+        "SideEffect"
+      ],
+      "strength_levels": [
+        "first_line",
+        "standard",
+        "investigational",
+        "off_label"
+      ],
+      "example": "Trastuzumab treats HER2-positive breast cancer"
+    },
+    "prevents": {
+      "description": "Factor X reduces the likelihood of condition Y developing",
+      "domain": [
+        "ProtectiveFactor",
+        "Medication",
+        "PreventionAndScreening"
+      ],
+      "range": [
+        "BreastCancer",
+        "Recurrence"
+      ],
+      "strength_levels": [
+        "proven",
+        "probable",
+        "possible"
+      ],
+      "example": "Tamoxifen prevents ER-positive breast cancer"
+    },
+    "increases_risk_of": {
+      "description": "Factor X increases the probability of condition Y",
+      "domain": [
+        "RiskFactor",
+        "GeneticFactor",
+        "Medication"
+      ],
+      "range": [
+        "BreastCancer",
+        "BreastCancerSubtype",
+        "Recurrence",
+        "SideEffect"
+      ],
+      "strength_levels": [
+        "strong",
+        "moderate",
+        "weak"
+      ],
+      "example": "BRCA1 mutation increases risk of breast cancer"
+    },
+    "decreases_risk_of": {
+      "description": "Factor X reduces the probability of condition Y",
+      "domain": [
+        "ProtectiveFactor",
+        "Medication",
+        "Treatment"
+      ],
+      "range": [
+        "BreastCancer",
+        "Recurrence",
+        "Metastasis"
+      ],
+      "strength_levels": [
+        "strong",
+        "moderate",
+        "weak"
+      ],
+      "example": "Regular exercise decreases risk of breast cancer"
+    },
+    "detects": {
+      "description": "Test X can identify or diagnose condition Y",
+      "domain": [
+        "DiagnosticTest"
+      ],
+      "range": [
+        "BreastCancer",
+        "BreastCancerSubtype",
+        "Biomarker",
+        "Metastasis"
+      ],
+      "example": "Mammogram detects breast cancer"
+    },
+    "has_biomarker": {
+      "description": "Cancer subtype X is characterized by biomarker Y status",
+      "domain": [
+        "BreastCancerSubtype"
+      ],
+      "range": [
+        "Biomarker"
+      ],
+      "example": "HER2-positive breast cancer has_biomarker HER2 overexpression"
+    },
+    "has_side_effect": {
+      "description": "Treatment X can cause adverse effect Y",
+      "domain": [
+        "Treatment",
+        "Medication"
+      ],
+      "range": [
+        "SideEffect"
+      ],
+      "strength_levels": [
+        "common",
+        "uncommon",
+        "rare"
+      ],
+      "example": "Chemotherapy has_side_effect hair loss"
+    },
+    "contraindicated_for": {
+      "description": "Treatment X should NOT be used for condition/situation Y",
+      "domain": [
+        "Treatment",
+        "Medication"
+      ],
+      "range": [
+        "BreastCancerSubtype",
+        "SideEffect"
+      ],
+      "example": "Endocrine therapy is contraindicated for triple-negative breast cancer"
+    },
+    "associated_with": {
+      "description": "Entity X is statistically or clinically associated with entity Y",
+      "domain": [
+        "Biomarker",
+        "GeneticFactor",
+        "Symptom"
+      ],
+      "range": [
+        "BreastCancerSubtype",
+        "Treatment",
+        "Metastasis"
+      ],
+      "example": "HER2/neu is associated with aggressive tumor behavior"
+    },
+    "causes": {
+      "description": "Factor X directly causes outcome Y",
+      "domain": [
+        "GeneticFactor",
+        "Treatment",
+        "Medication"
+      ],
+      "range": [
+        "BreastCancer",
+        "SideEffect",
+        "Recurrence"
+      ],
+      "note": "Use sparingly; most cancer relationships are probabilistic, not causal",
+      "example": "Radiation to chest in adolescence causes increased breast cancer risk"
+    },
+    "reduces_recurrence_risk": {
+      "description": "Intervention X lowers the chance of cancer returning",
+      "domain": [
+        "Treatment",
+        "Medication"
+      ],
+      "range": [
+        "Recurrence"
+      ],
+      "strength_levels": [
+        "strong",
+        "moderate",
+        "weak"
+      ],
+      "example": "Adjuvant chemotherapy reduces recurrence risk"
+    },
+    "improves_survival": {
+      "description": "Intervention X is associated with longer overall or disease-free survival",
+      "domain": [
+        "Treatment",
+        "Medication"
+      ],
+      "range": [
+        "BreastCancer",
+        "BreastCancerSubtype"
+      ],
+      "strength_levels": [
+        "proven",
+        "probable",
+        "possible"
+      ],
+      "example": "Trastuzumab improves survival in HER2-positive breast cancer"
+    }
+  },
+  "modifiers": {
+    "negation": {
+      "description": "Negates a relation (e.g., 'does NOT treat')",
+      "values": [
+        true,
+        false
+      ],
+      "default": false,
+      "example": "Chemotherapy does NOT treat (negated: true) triple-negative breast cancer with endocrine therapy"
+    },
+    "certainty": {
+      "description": "Epistemic certainty of the claim",
+      "values": [
+        "definite",
+        "probable",
+        "possible",
+        "uncertain",
+        "false"
+      ],
+      "default": "definite",
+      "examples": {
+        "definite": "Tamoxifen blocks estrogen receptors",
+        "probable": "Exercise likely reduces breast cancer risk",
+        "possible": "Some studies suggest vitamin D may lower risk",
+        "uncertain": "The role of diet in breast cancer is unclear",
+        "false": "Underwire bras cause breast cancer"
+      }
+    },
+    "temporality": {
+      "description": "When the relation holds",
+      "values": [
+        "always",
+        "during_treatment",
+        "post_treatment",
+        "pre_treatment",
+        "conditional"
+      ],
+      "default": "always"
+    },
+    "strength": {
+      "description": "How strong the association or effect is",
+      "values": [
+        "strong",
+        "moderate",
+        "weak",
+        "negligible"
+      ],
+      "default": "moderate"
+    },
+    "population_scope": {
+      "description": "Which patient population the claim applies to",
+      "values": [
+        "all_patients",
+        "subtype_specific",
+        "stage_specific",
+        "age_specific",
+        "genotype_specific"
+      ],
+      "default": "all_patients"
+    },
+    "source_quality": {
+      "description": "Evidence quality supporting the relation",
+      "values": [
+        "clinical_guideline",
+        "meta_analysis",
+        "randomized_trial",
+        "observational_study",
+        "expert_opinion",
+        "anecdotal"
+      ],
+      "default": "clinical_guideline"
+    }
+  },
+  "factual_relations": [
+    {
+      "subject": "Trastuzumab",
+      "relation": "treats",
+      "object": "HER2-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "subject": "Pertuzumab",
+      "relation": "treats",
+      "object": "HER2-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "subject": "Endocrine Therapy",
+      "relation": "treats",
+      "object": "Hormone Receptor-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "subject": "Tamoxifen",
+      "relation": "treats",
+      "object": "Hormone Receptor-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "treats",
+      "object": "Triple-Negative Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "treats",
+      "object": "HER2-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines",
+      "note": "Often combined with HER2-targeted therapy"
+    },
+    {
+      "subject": "Pembrolizumab",
+      "relation": "treats",
+      "object": "Triple-Negative Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "KEYNOTE-522",
+      "note": "In combination with chemotherapy for early-stage TNBC"
+    },
+    {
+      "subject": "Olaparib",
+      "relation": "treats",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "OlympiA Trial",
+      "note": "For BRCA-mutated, HER2-negative early breast cancer"
+    },
+    {
+      "subject": "Palbociclib",
+      "relation": "treats",
+      "object": "Hormone Receptor-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines",
+      "note": "In combination with endocrine therapy for advanced HR+/HER2-"
+    },
+    {
+      "subject": "Radiation Therapy",
+      "relation": "treats",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "subject": "Endocrine Therapy",
+      "relation": "contraindicated_for",
+      "object": "Triple-Negative Breast Cancer",
+      "certainty": "definite",
+      "source": "NCCN Guidelines",
+      "note": "TNBC lacks hormone receptors"
+    },
+    {
+      "subject": "Trastuzumab",
+      "relation": "contraindicated_for",
+      "object": "Triple-Negative Breast Cancer",
+      "certainty": "definite",
+      "source": "NCCN Guidelines",
+      "note": "TNBC is HER2-negative by definition"
+    },
+    {
+      "subject": "Tamoxifen",
+      "relation": "contraindicated_for",
+      "object": "Triple-Negative Breast Cancer",
+      "certainty": "definite",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "treats",
+      "object": "HER2-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "NCCN Guidelines",
+      "note": "HER2-targeted therapy is typically ADDED to chemotherapy, not used INSTEAD of it"
+    },
+    {
+      "subject": "HER2-Positive Breast Cancer",
+      "relation": "has_biomarker",
+      "object": "HER2/neu",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Hormone Receptor-Positive Breast Cancer",
+      "relation": "has_biomarker",
+      "object": "Estrogen Receptor",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Hormone Receptor-Positive Breast Cancer",
+      "relation": "has_biomarker",
+      "object": "Progesterone Receptor",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Triple-Negative Breast Cancer",
+      "relation": "has_biomarker",
+      "object": "Estrogen Receptor",
+      "certainty": "definite",
+      "negated": true,
+      "note": "ER-negative"
+    },
+    {
+      "subject": "Triple-Negative Breast Cancer",
+      "relation": "has_biomarker",
+      "object": "Progesterone Receptor",
+      "certainty": "definite",
+      "negated": true,
+      "note": "PR-negative"
+    },
+    {
+      "subject": "Triple-Negative Breast Cancer",
+      "relation": "has_biomarker",
+      "object": "HER2/neu",
+      "certainty": "definite",
+      "negated": true,
+      "note": "HER2-negative"
+    },
+    {
+      "subject": "BRCA1",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "Multiple studies"
+    },
+    {
+      "subject": "BRCA2",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "Multiple studies"
+    },
+    {
+      "subject": "Family history of breast cancer",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Older age",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Obesity",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "moderate",
+      "certainty": "probable",
+      "note": "Especially post-menopausal"
+    },
+    {
+      "subject": "Alcohol consumption",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "moderate",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Hormone replacement therapy",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "moderate",
+      "certainty": "definite",
+      "note": "Combined estrogen+progestin"
+    },
+    {
+      "subject": "Dense breast tissue",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "moderate",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Regular exercise",
+      "relation": "decreases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "moderate",
+      "certainty": "probable"
+    },
+    {
+      "subject": "Breastfeeding",
+      "relation": "decreases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "moderate",
+      "certainty": "probable"
+    },
+    {
+      "subject": "Prophylactic mastectomy",
+      "relation": "decreases_risk_of",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "note": "Reduces risk by ~90% in high-risk women"
+    },
+    {
+      "subject": "Tamoxifen",
+      "relation": "prevents",
+      "object": "Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "note": "Reduces risk of ER-positive breast cancer by ~50% in high-risk women"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "has_side_effect",
+      "object": "Hair loss",
+      "strength": "common",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "has_side_effect",
+      "object": "Nausea and vomiting",
+      "strength": "common",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "has_side_effect",
+      "object": "Neutropenia",
+      "strength": "common",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "has_side_effect",
+      "object": "Neuropathy",
+      "strength": "common",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Chemotherapy",
+      "relation": "has_side_effect",
+      "object": "Cognitive changes",
+      "strength": "moderate",
+      "certainty": "probable"
+    },
+    {
+      "subject": "Trastuzumab",
+      "relation": "has_side_effect",
+      "object": "Cardiotoxicity",
+      "strength": "uncommon",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Tamoxifen",
+      "relation": "has_side_effect",
+      "object": "Hot flashes",
+      "strength": "common",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Radiation Therapy",
+      "relation": "has_side_effect",
+      "object": "Skin irritation",
+      "strength": "common",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Radiation Therapy",
+      "relation": "has_side_effect",
+      "object": "Lymphedema",
+      "strength": "uncommon",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Adjuvant Therapy",
+      "relation": "reduces_recurrence_risk",
+      "object": "Recurrence",
+      "strength": "strong",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Trastuzumab",
+      "relation": "improves_survival",
+      "object": "HER2-Positive Breast Cancer",
+      "strength": "strong",
+      "certainty": "definite",
+      "source": "HERA trial"
+    },
+    {
+      "subject": "Endocrine Therapy",
+      "relation": "reduces_recurrence_risk",
+      "object": "Recurrence",
+      "strength": "strong",
+      "certainty": "definite",
+      "note": "For HR+ breast cancer"
+    },
+    {
+      "subject": "Mammogram",
+      "relation": "detects",
+      "object": "Breast Cancer",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Breast Ultrasound",
+      "relation": "detects",
+      "object": "Breast Cancer",
+      "certainty": "definite",
+      "note": "Complementary to mammography, especially for dense breasts"
+    },
+    {
+      "subject": "Breast MRI",
+      "relation": "detects",
+      "object": "Breast Cancer",
+      "certainty": "definite",
+      "note": "High sensitivity; recommended for high-risk women"
+    },
+    {
+      "subject": "Biopsy",
+      "relation": "detects",
+      "object": "Breast Cancer",
+      "certainty": "definite",
+      "note": "Definitive diagnostic test"
+    },
+    {
+      "subject": "Immunohistochemistry",
+      "relation": "detects",
+      "object": "Estrogen Receptor",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Immunohistochemistry",
+      "relation": "detects",
+      "object": "Progesterone Receptor",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Immunohistochemistry",
+      "relation": "detects",
+      "object": "HER2/neu",
+      "certainty": "definite"
+    },
+    {
+      "subject": "FISH Test",
+      "relation": "detects",
+      "object": "HER2/neu",
+      "certainty": "definite",
+      "note": "Confirms HER2 gene amplification"
+    },
+    {
+      "subject": "Genetic Testing",
+      "relation": "detects",
+      "object": "BRCA1",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Genetic Testing",
+      "relation": "detects",
+      "object": "BRCA2",
+      "certainty": "definite"
+    },
+    {
+      "subject": "Bone pain",
+      "relation": "associated_with",
+      "object": "Bone metastasis",
+      "certainty": "probable"
+    },
+    {
+      "subject": "HER2-Positive Breast Cancer",
+      "relation": "associated_with",
+      "object": "Brain metastasis",
+      "certainty": "probable",
+      "note": "Higher incidence of brain metastasis"
+    }
+  ],
+  "common_misinformation": [
+    {
+      "claim": "Underwire bras cause breast cancer",
+      "verdict": "false",
+      "explanation": "No scientific evidence links bra type to breast cancer risk",
+      "source": "American Cancer Society"
+    },
+    {
+      "claim": "Deodorant/antiperspirant causes breast cancer",
+      "verdict": "false",
+      "explanation": "No conclusive evidence links deodorant use to breast cancer",
+      "source": "National Cancer Institute"
+    },
+    {
+      "claim": "If you have no family history, you won't get breast cancer",
+      "verdict": "misleading",
+      "explanation": "Most breast cancers (~85%) occur in women with no family history. Family history increases risk but is not required.",
+      "source": "American Cancer Society"
+    },
+    {
+      "claim": "A breast cancer diagnosis is a death sentence",
+      "verdict": "misleading",
+      "explanation": "5-year relative survival for localized breast cancer is ~99%. Even Stage IV has improving outcomes.",
+      "source": "SEER Cancer Statistics"
+    },
+    {
+      "claim": "Chemotherapy won't work for HER2-positive breast cancer",
+      "verdict": "misleading",
+      "explanation": "Chemotherapy IS used for HER2+ breast cancer, typically in combination with HER2-targeted therapy. Targeted therapy supplements chemo, not replaces it.",
+      "source": "NCCN Guidelines"
+    },
+    {
+      "claim": "Only women get breast cancer",
+      "verdict": "misleading",
+      "explanation": "Men can get breast cancer too, though it is rare (~1% of cases).",
+      "source": "American Cancer Society"
+    },
+    {
+      "claim": "Mammograms cause breast cancer due to radiation",
+      "verdict": "misleading",
+      "explanation": "Radiation dose from mammography is very low. Benefits of early detection far outweigh the minimal risk.",
+      "source": "American College of Radiology"
+    },
+    {
+      "claim": "Sugar feeds cancer and you should eliminate it completely",
+      "verdict": "misleading",
+      "explanation": "All cells use glucose, not just cancer cells. Eliminating sugar doesn't starve cancer. However, excessive sugar intake contributes to obesity, which is a risk factor.",
+      "source": "Mayo Clinic"
+    },
+    {
+      "claim": "Natural remedies can cure breast cancer without conventional treatment",
+      "verdict": "false",
+      "explanation": "No natural remedy has been proven to cure breast cancer. Delaying proven treatment can worsen outcomes.",
+      "source": "National Cancer Institute"
+    },
+    {
+      "claim": "If your mammogram is normal, you definitely don't have breast cancer",
+      "verdict": "misleading",
+      "explanation": "Mammograms miss about 1 in 8 breast cancers. Dense breast tissue can obscure tumors. Additional screening may be needed.",
+      "source": "American Cancer Society"
+    }
+  ],
+  "medquad_extracted_concepts": {
+    "symptom": [
+      "Fatigue",
+      "Pain",
+      "Weight loss",
+      "dimple",
+      "fluid.     - Nipple",
+      "lump",
+      "nipple turned inward",
+      "pain",
+      "puckering",
+      "swollen skin",
+      "thickening",
+      "weight loss"
+    ],
+    "risk_factor": [
+      "Age",
+      "Alcohol",
+      "Dense breast",
+      "Family history",
+      "Hormone therapy",
+      "Menstruating at an early",
+      "Obesity",
+      "Radiation exposure",
+      "age",
+      "alcohol",
+      "dense breast",
+      "family history",
+      "hormone replacement therapy",
+      "hormone therapy",
+      "menopause at a late",
+      "menstruation at an early",
+      "never having given birth"
+    ],
+    "diagnostic_test": [
+      "Biopsy",
+      "Blood chemistry",
+      "Bone scan",
+      "CT scan",
+      "Clinical breast exam",
+      "Complete blood count",
+      "Cytogenetic analysis",
+      "Immunophenotyping",
+      "MRI",
+      "Mammogram",
+      "PET scan",
+      "Physical exam",
+      "Sentinel lymph node biopsy",
+      "Ultrasound",
+      "biopsy",
+      "clinical breast exam",
+      "mammogram",
+      "physical exam",
+      "ultrasound"
+    ],
+    "treatment": [
+      "Aromatase inhibitor",
+      "Biologic therapy",
+      "Chemotherapy",
+      "Hormone therapy",
+      "Immunotherapy",
+      "Mastectomy",
+      "Oophorectomy",
+      "Ovarian ablation",
+      "Pertuzumab",
+      "Radiation therapy",
+      "Selective estrogen receptor modulator",
+      "Sentinel lymph node biopsy",
+      "Surgery",
+      "Tamoxifen",
+      "Targeted therapy",
+      "Trastuzumab",
+      "adjuvant",
+      "aromatase inhibitor",
+      "chemotherapy",
+      "hormone therapy",
+      "immunotherapy",
+      "lumpectomy",
+      "mastectomy",
+      "neoadjuvant",
+      "oophorectomy",
+      "ovarian ablation",
+      "pertuzumab",
+      "radiation therapy",
+      "selective estrogen receptor modulator",
+      "stem cell transplant",
+      "surgery",
+      "tamoxifen",
+      "targeted therapy",
+      "trastuzumab"
+    ],
+    "stage": [
+      "Locally Advanced",
+      "Stage 0",
+      "Stage I",
+      "Stage II",
+      "Stage III",
+      "Stage IIIA",
+      "Stage IV",
+      "carcinoma in situ",
+      "metastatic",
+      "stage I",
+      "stage II",
+      "stage III",
+      "stage IIIA",
+      "stage IV"
+    ],
+    "genetic_factor": [
+      "BRCA1",
+      "BRCA2",
+      "Hereditary",
+      "gene mutation",
+      "hereditary",
+      "inherited condition, gene",
+      "inherited gene"
+    ],
+    "biomarker": [
+      "BRCA1",
+      "BRCA2",
+      "ER-positive",
+      "Estrogen receptor",
+      "HER2",
+      "HER2/neu",
+      "MammaPrint",
+      "Oncotype DX",
+      "estrogen receptor",
+      "progesterone receptor"
+    ],
+    "breast_cancer_subtype": [
+      "Ductal carcinoma",
+      "Ductal carcinoma in situ (DCIS)",
+      "Hormone receptor positive",
+      "Inflammatory Breast Cancer",
+      "Inflammatory breast cancer",
+      "Lobular carcinoma",
+      "Lobular carcinoma in situ (LCIS)",
+      "Paget disease of the nipple",
+      "Triple negative",
+      "ductal carcinoma",
+      "ductal carcinoma in situ (DCIS)",
+      "estrogen receptor positive",
+      "estrogen receptor-positive",
+      "hormone receptor negative",
+      "hormone receptor positive",
+      "inflammatory breast cancer",
+      "invasive breast cancer",
+      "lobular carcinoma",
+      "lobular carcinoma in situ (LCIS)",
+      "metastatic breast cancer",
+      "progesterone receptor negative",
+      "progesterone receptor positive",
+      "triple negative"
+    ]
+  }
+}

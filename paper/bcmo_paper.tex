@@ -1,0 +1,309 @@
+\documentclass[10pt,a4paper]{article}
+
+% ── Packages ──
+\usepackage[margin=0.6in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{caption}
+
+% ── Formatting ──
+\setlist{nosep,leftmargin=12pt}
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+\titleformat{\section}{\normalsize\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\small\bfseries}{\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{8pt}{2pt}
+\titlespacing*{\subsection}{0pt}{6pt}{2pt}
+\captionsetup{font=small,labelfont=bf,skip=2pt}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
+
+% ══════════════════════════════════════════════════════════
+\begin{document}
+
+% ── Title ──
+\begin{center}
+    {\Large\bfseries BCMO: A Data-Grounded Breast Cancer Ontology \\[2pt]
+    for Misinformation Detection from MedQuAD}\\[6pt]
+    {\normalsize Meharry Medical College, NLP Course Project \hfill October 2026}
+\end{center}
+\vspace{2pt}
+\hrule
+\vspace{4pt}
+
+% ══════════════════════════════════════════════════════════
+\section{Abstract}
+
+Online patient forums and AI chatbots have become go-to resources for breast cancer information, but they are also breeding grounds for medical misinformation. Current large language models (LLMs) are poorly equipped to catch the kinds of half-truths and false presuppositions that show up in real patient conversations. In this paper we describe the construction of the Breast Cancer Misinformation Ontology (BCMO v2.0), a specialized knowledge base built from the ground up using the MedQuAD medical question-answering dataset alongside clinician-reviewed guidelines. We parsed 43 breast-cancer-specific documents drawn from 6 MedQuAD subsets and pulled out 118 normalized medical concepts and 98 factual relations directly from the text. These were then combined with 55 additional relations curated from NCCN treatment guidelines and the NCI Thesaurus. The finished ontology spans 15 concept classes, 168 instances, 14 relation types, and 136 total factual relations, each tagged with its origin (60\% from MedQuAD, 40\% expert-added). Rather than returning a simple true-or-false answer, BCMO supports a four-way verdict system (supported, contradicted, unsupported, or misleading), giving downstream applications the nuance they need to handle tricky cases like partial truths and outdated advice.
+
+% ══════════════════════════════════════════════════════════
+\section{Introduction}
+
+A growing number of breast cancer patients turn to the internet, including forums, social media groups, and AI chatbots, to understand their diagnosis before, during, and after treatment. The trouble is that these spaces are full of claims that range from mildly misleading to outright dangerous. Some misinformation is obvious (``bras cause breast cancer''), but much of it is subtler: a patient might say ``since my tumor is HER2-positive, chemotherapy won't help me,'' which sounds reasonable on the surface but is clinically wrong. Chemotherapy remains a standard part of HER2-positive treatment; targeted drugs like Trastuzumab are given \textit{on top of} chemo, not instead of it.
+
+LLMs, for all their fluency, are unreliable gatekeepers here. They draw on parametric knowledge that can be stale or simply incorrect, and when prompted to be more cautious they tend to flag even harmless questions as potentially wrong. The CancerMyth benchmark, a set of 585 adversarial breast cancer questions, shows that even the best models stumble on exactly these kinds of nuanced cases.
+
+Several recent projects have tried to ground LLM outputs in structured medical knowledge. FAITH~\cite{zhou2026faith} decomposes model responses into atomic claims and checks them against a knowledge graph. CER~\cite{barone2025cer} retrieves published evidence to back up or refute biomedical assertions. MedGraphRAG~\cite{wu2024medgraphrag} links documents to controlled vocabularies for traceable answers. These are promising directions, but they all rely on general-purpose medical knowledge bases that were never designed with breast cancer misinformation in mind. They lack the kind of domain-specific reasoning that matters most: knowing that endocrine therapy is pointless for triple-negative tumors (which have no hormone receptors to target), or that a ``Stage IIIA'' label means something very different from ``metastatic.''
+
+BCMO was built to fill that gap. It differs from prior work in three concrete ways. First, its facts are grounded in MedQuAD~\cite{benabacha2019}, a curated QA dataset from NIH sources, so every extracted relation can be traced back to a specific document and question-answer pair. Second, it includes relation types purpose-built for catching misinformation, such as \texttt{contraindicated\_for} and negated biomarker assertions, along with modifiers for certainty and strength. Third, its verification engine returns one of four verdicts (supported, contradicted, unsupported, or misleading) rather than a binary true/false.
+
+% ══════════════════════════════════════════════════════════
+\section{Method}
+
+\subsection{Data Source and Filtering}
+
+MedQuAD~\cite{benabacha2019} is a collection of 47,457 medical question-answer pairs assembled from trusted NIH sources and organized into 12 subsets by institution. Each entry is stored as XML with a \texttt{<Focus>} tag naming the disease, UMLS concept annotations, and one or more QA pairs labeled with a question type (\texttt{qtype}): treatment, symptoms, susceptibility, stages, prevention, and so on. We chose MedQuAD over web-scraped alternatives because every piece of content traces back to an NIH-maintained page, and the typed questions give us useful semantic handles for relation extraction.
+
+A common shortcut when working with MedQuAD for breast cancer is to grep for the phrase ``breast cancer'' across all answer text. This pulls in dozens of unrelated documents; a Hodgkin Lymphoma page, for instance, mentions breast radiation as a risk factor and gets swept up in the results. We took a stricter approach: rather than searching answer text, we matched 28 curated patterns against the \texttt{<Focus>} tag, which names the actual topic of each document. This gave us 43 breast-cancer-focused documents from 6 of the 12 subsets (Table~\ref{tab:subsets}), a cleaner and more topically precise set than keyword filtering produces.
+
+\begin{table}[H]
+    \centering
+    \caption{Breast cancer documents identified across MedQuAD subsets.}
+    \label{tab:subsets}
+    \vspace{2pt}
+    \begin{tabular}{@{}lc@{\hskip 24pt}lc@{}}
+        \toprule
+        \textbf{MedQuAD Subset} & \textbf{Docs} & \textbf{MedQuAD Subset} & \textbf{Docs} \\
+        \midrule
+        MedlinePlus ADAM        & 27 & GARD (Rare Diseases)    & 4  \\
+        CancerGov               & 5  & GHR (Genetics)          & 1  \\
+        MedlinePlus Health Topics & 5  & SeniorHealth           & 1  \\
+        \midrule
+        \multicolumn{3}{@{}l}{\textbf{Total}} & \textbf{43} \\
+        \multicolumn{3}{@{}l}{\textit{Total QA pairs}} & \textit{161} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The bulk of the documents come from MedlinePlus ADAM (27), which covers screening, staging, mastectomy, and drug therapies. CancerGov contributes 5 detailed treatment documents with stage-by-stage regimens. The GARD subset adds rarer subtypes like inflammatory breast cancer, metaplastic carcinoma, and the hereditary BRCA syndromes, while GHR fills in breast cancer genetics.
+
+\subsection{Concept Extraction and Normalization}
+
+From the 161 QA pairs in these 43 documents, we ran category-specific regular expressions to pull out medical concepts in 10 semantic categories: cancer subtypes, biomarkers, treatments, diagnostic tests, symptoms, risk factors, protective factors, genetic factors, stages, and side effects. Raw regex matches tend to produce a messy list. ``Mammogram'' and ``mammogram'' show up as separate entries, and ``DCIS'' appears alongside ``ductal carcinoma in situ.'' To clean this up, every match passes through a normalization layer that maps it to a single canonical name. The result is 118 unique concepts (Table~\ref{tab:concepts}).
+
+\begin{table}[H]
+    \centering
+    \caption{Extracted concepts by semantic category.}
+    \label{tab:concepts}
+    \vspace{2pt}
+    \begin{tabular}{@{}lc@{\hskip 20pt}lc@{}}
+        \toprule
+        \textbf{Category} & \textbf{Count} & \textbf{Category} & \textbf{Count} \\
+        \midrule
+        Treatment            & 26 & Biomarker           & 9  \\
+        Breast Cancer Subtype & 16 & Symptom             & 8  \\
+        Diagnostic Test      & 15 & Side Effect         & 7  \\
+        Stage                & 15 & Genetic Factor      & 6  \\
+        Risk Factor          & 13 & Protective Factor   & 3  \\
+        \midrule
+        \multicolumn{3}{@{}l}{\textbf{Total unique concepts}} & \textbf{118} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Relation Extraction Using Question Types}
+
+One useful property of MedQuAD is that every question comes labeled with a type. We leaned on these labels as shortcuts for deciding what kind of relation to look for in each answer. A QA pair tagged \texttt{treatment} is almost certainly going to mention drugs or procedures that treat some condition, so we run our ``treats'' and ``has\_side\_effect'' extractors there. Pairs labeled \texttt{susceptibility} get the ``increases\_risk\_of'' extractor, \texttt{symptoms} triggers ``has\_symptom,'' and so on. This is more targeted than running every extractor on every paragraph and cuts down on false positives.
+
+Within each answer, pattern-based extractors identify subject-relation-object triples. For treatment relations, we look for constructions such as ``Treatment of [condition] may include [therapy]'' and ``[Drug] is used to treat [condition],'' normalizing the condition names back to ontology-standard labels. Every extracted triple is stamped with the document and QA pair it came from, so it can be traced back later. After removing duplicates, this process produced 98 relations (Table~\ref{tab:relations}).
+
+\begin{table}[H]
+    \centering
+    \caption{Data-grounded relations extracted from MedQuAD.}
+    \label{tab:relations}
+    \vspace{2pt}
+    \begin{tabular}{@{}lc@{\hskip 20pt}lc@{}}
+        \toprule
+        \textbf{Relation Type} & \textbf{Count} & \textbf{Relation Type} & \textbf{Count} \\
+        \midrule
+        \texttt{treats}              & 32 & \texttt{has\_side\_effect}   & 10 \\
+        \texttt{increases\_risk\_of} & 16 & \texttt{has\_symptom}        & 7  \\
+        \texttt{has\_stage}          & 14 & \texttt{decreases\_risk\_of} & 4  \\
+        \texttt{detects}             & 12 & \texttt{has\_biomarker}      & 3  \\
+        \midrule
+        \multicolumn{3}{@{}l}{\textbf{Total unique relations}} & \textbf{98} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Merging Extracted and Expert Knowledge}
+
+MedQuAD gives us a solid factual backbone, but there are things no amount of text mining will pick up: clinical contraindications, trial-level survival data, and the reasoning behind negated biomarker assertions. For these, we added 55 expert-curated relations drawn from NCCN Clinical Practice Guidelines~\cite{nccn2026}, the NCI Thesaurus~\cite{nci2026}, and UMLS. For example, the fact that endocrine therapy is contraindicated for triple-negative breast cancer (because TNBC by definition lacks hormone receptors) is not something our extractors would find phrased that way in a patient-facing QA document, but it is critical for catching misinformation.
+
+The merge works as follows. We start with 15 expert-defined concept classes, each populated with instances that have UMLS codes, aliases, and short descriptions. Any MedQuAD-extracted concept that is not already represented gets added with a ``MedQuAD'' source tag. For relations, expert entries take priority when a duplicate triple exists. The combined set has 136 relations total. Six modifier types (negation, certainty, strength, temporality, population scope, and source quality) allow each relation to carry nuance beyond a flat assertion. Ten known misinformation patterns, meaning common myths with explanations, round out the ontology.
+
+\subsection{Claim Verification}
+
+The verification engine takes a (subject, relation, object) triple and checks it against the ontology. It can return one of four verdicts:
+
+\begin{itemize}
+    \item \textbf{Supported}: the triple matches a stored factual relation.
+    \item \textbf{Contradicted}: a counter-relation exists (for instance, \texttt{treats} paired with a known \texttt{contraindicated\_for} on the same entities).
+    \item \textbf{Unsupported}: both entities appear in the ontology, but the claimed relation between them is not recorded.
+    \item \textbf{Misleading}: the input text matches a known misinformation pattern via word-overlap scoring.
+\end{itemize}
+
+Where applicable, the verdict comes with an explanatory note pulled from the ontology, such as ``TNBC lacks hormone receptors'' when an endocrine therapy claim is contradicted.
+
+% ══════════════════════════════════════════════════════════
+\section{Results}
+
+\subsection{Ontology at a Glance}
+
+Table~\ref{tab:summary} gives the top-level numbers for BCMO v2.0. The Treatment class ended up with the most instances (27), 16 of which came from MedQuAD, reflecting how many specific drugs and procedures are discussed in treatment-focused QA pairs. Other large classes include DiagnosticTest, BreastCancerSubtype, and SideEffect, each at 16.
+
+\begin{table}[H]
+    \centering
+    \caption{BCMO v2.0 ontology summary.}
+    \label{tab:summary}
+    \vspace{2pt}
+    \begin{tabular}{@{}lr@{\hskip 24pt}lr@{}}
+        \toprule
+        \textbf{Metric} & \textbf{Value} & \textbf{Metric} & \textbf{Value} \\
+        \midrule
+        Concept classes      & 15          & Relation types       & 14          \\
+        Total instances      & 168         & Total relations      & 136         \\
+        \quad Expert-curated & 131         & \quad Expert-curated & 55 (40\%)   \\
+        \quad MedQuAD        & 37          & \quad MedQuAD        & 81 (60\%)   \\
+        Modifier types       & 6           & Misinfo.\ patterns   & 10          \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+On the validation side, every one of the 118 concepts we pulled from MedQuAD maps to an ontology entry by name or alias, giving us full coverage. We found only 4 minor consistency issues, all caused by long-winded MedQuAD phrasings that do not correspond to any single ontology concept. There are 16 cases where a concept appears in two classes (e.g., Trastuzumab is in both Treatment and Medication; BRCA1 is in both GeneticFactor and Biomarker), but these are intentional dual classifications, not errors. No duplicate relations were found.
+
+\subsection{Claim Verification in Practice}
+
+Table~\ref{tab:verification} walks through six test claims and the verdicts BCMO returns.
+
+\begin{table}[H]
+    \centering
+    \caption{Claim verification examples against BCMO v2.0.}
+    \label{tab:verification}
+    \vspace{2pt}
+    \begin{tabular}{@{}p{5.2cm}lp{4cm}@{}}
+        \toprule
+        \textbf{Claim Triple} & \textbf{Verdict} & \textbf{Explanation} \\
+        \midrule
+        Trastuzumab $\rightarrow$ \texttt{treats} $\rightarrow$ HER2+ BC
+            & Supported    & Per NCCN Guidelines \\[3pt]
+        Endocrine Therapy $\rightarrow$ \texttt{treats} $\rightarrow$ TNBC
+            & Contradicted & TNBC lacks hormone receptors \\[3pt]
+        Chemotherapy $\rightarrow$ \texttt{treats} $\rightarrow$ HER2+ BC
+            & Supported    & Combined with HER2-targeted therapy \\[3pt]
+        Vitamin C $\rightarrow$ \texttt{treats} $\rightarrow$ Breast Cancer
+            & Unsupported  & No evidence in ontology \\[3pt]
+        Family History $\rightarrow$ \texttt{increases\_risk} $\rightarrow$ BC
+            & Supported    & Strong evidence \\[3pt]
+        Breastfeeding $\rightarrow$ \texttt{decreases\_risk} $\rightarrow$ BC
+            & Supported    & Moderate evidence \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The interesting case is the endocrine therapy / TNBC claim. A simpler system might call this ``unsupported'' (no matching relation found), but BCMO flags it as ``contradicted'' because it stores an explicit \texttt{contraindicated\_for} link between the two, along with the reason. Similarly, the chemotherapy / HER2+ claim is confirmed but annotated with context: it is typically given alongside targeted therapy, not on its own. That kind of nuance matters when dealing with real patient questions.
+
+\subsection{Misinformation Detection}
+
+We also tested five statements phrased the way patients actually talk (Table~\ref{tab:misinfo}).
+
+\begin{table}[H]
+    \centering
+    \caption{Misinformation detection on patient-style statements.}
+    \label{tab:misinfo}
+    \vspace{2pt}
+    \begin{tabular}{@{}p{5.5cm}lp{3.8cm}@{}}
+        \toprule
+        \textbf{Patient Statement} & \textbf{Verdict} & \textbf{Reason} \\
+        \midrule
+        ``Underwire bras cause breast cancer''
+            & False     & No scientific evidence \\[3pt]
+        ``No family history means I won't get it''
+            & Misleading & 85\% of cases lack family history \\[3pt]
+        ``Natural remedies can cure breast cancer''
+            & False     & No proven natural cure \\[3pt]
+        ``Chemo is used for HER2+ breast cancer''
+            & No flag   & Factually correct \\[3pt]
+        ``Mammograms cause cancer from radiation''
+            & Misleading & Dose minimal; benefits outweigh risk \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The matcher correctly left the chemotherapy statement alone (it is true) while catching both outright false claims and the more insidious half-truths. The family history case is a good example of the ``misleading'' category: the claim is not fabricated, but it leaves out the fact that most breast cancer occurs in women with no family history at all.
+
+% ══════════════════════════════════════════════════════════
+\section{Discussion}
+
+The main contribution of this work is a breast cancer ontology that was designed from the start for misinformation detection, not repurposed from a general medical knowledge base. Existing systems like FAITH and CER rely on broad KGs that do not encode the kind of subtype-specific reasoning breast cancer requires: knowing which drugs work for which molecular subtypes, which treatments are actually contraindicated rather than merely unsupported, and how to handle partial truths.
+
+Pulling from 6 MedQuAD subsets rather than just CancerGov turned out to matter quite a bit. The MedlinePlus ADAM documents filled in screening, staging, and surgical detail that the CancerGov treatment pages do not cover. GARD contributed rare subtypes and hereditary syndromes that are underrepresented in general cancer resources. And using the question-type labels to steer extraction, rather than running every pattern on every paragraph, kept the false positive rate manageable while still yielding 98 usable relations.
+
+There are clear limitations. Regex-based extraction misses relations that are stated in complex or roundabout ways. The misinformation matcher relies on word overlap, which will not catch paraphrases that use very different vocabulary to express the same false idea. And the ontology currently has no mechanism for handling temporal changes in guidelines (a treatment that was experimental in 2020 may be standard of care today). In future work we plan to swap in an LLM-based extractor for the regex layer, test BCMO against the full CancerMyth benchmark and expert-annotated Reddit data, and run head-to-head comparisons of ontology-grounded verification against LLM-only and RAG-based baselines.
+
+% ══════════════════════════════════════════════════════════
+\newpage
+
+\begin{thebibliography}{9}
+\footnotesize
+\setlength{\itemsep}{1pt}
+\setlength{\parskip}{0pt}
+
+\bibitem{benabacha2019}
+Ben Abacha, A. and Demner-Fushman, D. (2019).
+A Question-Entailment Approach to Question Answering.
+\textit{BMC Bioinformatics}, 20(511).
+
+\bibitem{zhou2026faith}
+Zhou, K. et al. (2026).
+FAITH: Fact-Aligned Inference with Trustworthy Health Knowledge Graphs.
+\textit{AAAI 2026}. arXiv:2511.12817.
+
+\bibitem{barone2025cer}
+Barone, F. et al. (2025).
+CER: Claim, Evidence, and Reasoning for Biomedical Fact Verification.
+\textit{SIGIR 2025}. arXiv:2509.13888.
+
+\bibitem{wu2024medgraphrag}
+Wu, J. et al. (2024).
+MedGraphRAG: Graph Retrieval-Augmented Generation for Medical QA.
+arXiv:2408.04187.
+
+\bibitem{ming2026anchor}
+Ming, D. et al. (2026).
+ANCHOR-RE: Ontology-Constrained Biomedical Relation Extraction.
+arXiv:2608.03154.
+
+\bibitem{vladika2025atomic}
+Vladika, J. et al. (2025).
+Atomic Fact-Checking for Medical Question Answering.
+arXiv:2505.24830.
+
+\bibitem{hang2025trumor}
+Hang, C. et al. (2025).
+TrumorGPT: Health Fact-Checking via Semantic Knowledge Graphs.
+arXiv:2505.07891.
+
+\bibitem{nccn2026}
+NCCN Clinical Practice Guidelines in Oncology: Breast Cancer, Version 4.2026.
+
+\bibitem{nci2026}
+National Cancer Institute (NCI) Thesaurus, OBO Edition, 2026.
+
+\end{thebibliography}
+
+\end{document}
