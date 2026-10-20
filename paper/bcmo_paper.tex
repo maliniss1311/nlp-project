@@ -55,11 +55,42 @@ Online patient forums and AI chatbots have become go-to resources for breast can
 
 A growing number of breast cancer patients turn to the internet, including forums, social media groups, and AI chatbots, to understand their diagnosis before, during, and after treatment. The trouble is that these spaces are full of claims that range from mildly misleading to outright dangerous. Some misinformation is obvious (``bras cause breast cancer''), but much of it is subtler: a patient might say ``since my tumor is HER2-positive, chemotherapy won't help me,'' which sounds reasonable on the surface but is clinically wrong. Chemotherapy remains a standard part of HER2-positive treatment; targeted drugs like Trastuzumab are given \textit{on top of} chemo, not instead of it.
 
-LLMs, for all their fluency, are unreliable gatekeepers here. They draw on parametric knowledge that can be stale or simply incorrect, and when prompted to be more cautious they tend to flag even harmless questions as potentially wrong. The CancerMyth benchmark, a set of 585 adversarial breast cancer questions, shows that even the best models stumble on exactly these kinds of nuanced cases.
+LLMs, for all their fluency, are unreliable gatekeepers here. They draw on parametric knowledge that can be stale or simply incorrect, and when prompted to be more cautious they tend to flag even harmless questions as potentially wrong. The Cancer-Myth benchmark, 585 cancer questions containing false presuppositions, shows that even the best models stumble on exactly these kinds of nuanced cases.
 
 Several recent projects have tried to ground LLM outputs in structured medical knowledge. FAITH~\cite{zhou2026faith} decomposes model responses into atomic claims and checks them against a knowledge graph. CER~\cite{barone2025cer} retrieves published evidence to back up or refute biomedical assertions. MedGraphRAG~\cite{wu2024medgraphrag} links documents to controlled vocabularies for traceable answers. These are promising directions, but they all rely on general-purpose medical knowledge bases that were never designed with breast cancer misinformation in mind. They lack the kind of domain-specific reasoning that matters most: knowing that endocrine therapy is pointless for triple-negative tumors (which have no hormone receptors to target), or that a ``Stage IIIA'' label means something very different from ``metastatic.''
 
-BCMO was built to fill that gap. It differs from prior work in three concrete ways. First, its facts are grounded in MedQuAD~\cite{benabacha2019}, a curated QA dataset from NIH sources, so every extracted relation can be traced back to a specific document and question-answer pair. Second, it includes relation types purpose-built for catching misinformation, such as \texttt{contraindicated\_for} and negated biomarker assertions, along with modifiers for certainty and strength. Third, its verification engine returns one of four verdicts (supported, contradicted, unsupported, or misleading) rather than a binary true/false.
+BCMO was built to fill that gap. Section~\ref{sec:gap} sets out the specific gaps in prior work, what MedQuAD can and cannot contribute, and the contributions of this paper.
+
+% ══════════════════════════════════════════════════════════
+\section{Research Gap and Contributions}
+\label{sec:gap}
+
+\subsection{Gaps in Prior Work}
+
+Structured-knowledge fact-checkers consistently outperform LLM-only verification on medical claims~\cite{zhou2026faith,vladika2025atomic,wu2024medgraphrag}, and ontology constraints improve LLM reliability without fine-tuning~\cite{ming2026anchor}. Three gaps nevertheless remain for breast cancer misinformation in patient conversations.
+
+\textbf{Gap 1: No disease-specific knowledge designed for misinformation.} FAITH~\cite{zhou2026faith}, MedGraphRAG~\cite{wu2024medgraphrag}, and TrumorGPT~\cite{hang2025trumor} verify against general-purpose medical knowledge graphs. Such graphs can report that a link is \emph{absent} but cannot assert that a claim is \emph{wrong}. The claim ``endocrine therapy treats triple-negative breast cancer'' is clinically false because TNBC lacks hormone receptors, yet a general graph returns at best ``no evidence.'' Detecting it requires an explicit, disease-specific \texttt{contraindicated\_for} relation together with its rationale.
+
+\textbf{Gap 2: Binary verdicts cannot express partial truths.} Patient misinformation is frequently a half-truth (``no family history means I won't get it'') or an overstatement (``chemo definitely cures it'') rather than a fabrication. Existing systems label claims as correct or incorrect~\cite{vladika2025atomic} or score them against evidence~\cite{barone2025cer}, and none model the negation, certainty, or strength of a claim. TrumorGPT, for example, treats ``chemotherapy probably helps'' the same as ``chemotherapy definitely cures''~\cite{hang2025trumor}.
+
+\textbf{Gap 3: Verification targets the wrong kind of text.} Prior verifiers check news articles, scientific abstracts, or LLM-generated answers~\cite{barone2025cer,zhou2026faith}. Patients instead write informally and embed false premises in questions (``since I'm HER2-positive, why bother with chemo?''), where the misinformation is presupposed rather than asserted.
+
+\subsection{Role and Limits of MedQuAD}
+
+MedQuAD~\cite{benabacha2019} supplies the trusted side of verification. Its content is authored by NIH institutes, each answer is tied to a document and a labeled question type, and its UMLS annotations support entity normalization. These properties let every MedQuAD-derived fact in BCMO be traced to its source document, and the question-type labels let us target extraction (e.g., applying treatment patterns only to \texttt{treatment} answers).
+
+MedQuAD has three limits that shape our claims. First, it contains \emph{no misinformation and no patient-generated text}, so it can ground verification but cannot by itself evaluate misinformation detection. Second, its breast cancer coverage is small: 43 documents and 162 QA pairs across 6 subsets, of which 27 documents come from the MedlinePlus ADAM subset. Third, it rarely states contraindications or negated facts explicitly. The misinformation-oriented relations in BCMO, such as \texttt{contraindicated\_for}, therefore come mainly from the 55 expert-curated relations drawn from NCCN guidelines~\cite{nccn2026} and the NCI Thesaurus~\cite{nci2026}, not from text mining.
+
+\subsection{Contributions}
+
+\begin{enumerate}
+    \item \textbf{BCMO v2.0, a provenance-tracked breast cancer ontology.} 15 concept classes, 14 relation types, and 136 factual relations, each tagged with its origin: 81 (60\%) mined from MedQuAD and 55 (40\%) curated from clinical guidelines. All 118 concepts extracted from MedQuAD map to an ontology entry.
+    \item \textbf{Misinformation-oriented relations and modifiers.} Explicit contraindication relations and six modifiers (negation, certainty, temporality, strength, population scope, source quality) that allow a claim to be judged wrong or overstated, not merely unsupported (Gaps 1 and 2).
+    \item \textbf{A four-way verdict scheme.} Claims are labeled \emph{supported}, \emph{contradicted}, \emph{unsupported}, or \emph{misleading}, separating claims the ontology refutes from claims it simply does not cover (Gap 2).
+    \item \textbf{Question-type-guided extraction from MedQuAD.} Using MedQuAD's question-type labels to select extraction patterns yielded 98 source-linked relations from 162 QA pairs while limiting false positives.
+\end{enumerate}
+
+\textbf{Scope of current evidence.} The results in this paper demonstrate that BCMO can be constructed and queried, using hand-selected example claims (Section~\ref{sec:results}). They do not yet measure detection accuracy. Establishing that ontology grounding outperforms LLM-only and retrieval-augmented verification, including on patient-style paraphrases (Gap 3), requires an annotated evaluation set and head-to-head baselines, which we describe as future work in Section~\ref{sec:discussion}.
 
 % ══════════════════════════════════════════════════════════
 \section{Method}
@@ -161,6 +192,7 @@ Where applicable, the verdict comes with an explanatory note pulled from the ont
 
 % ══════════════════════════════════════════════════════════
 \section{Results}
+\label{sec:results}
 
 \subsection{Ontology at a Glance}
 
@@ -248,6 +280,7 @@ The matcher correctly left the chemotherapy statement alone (it is true) while c
 
 % ══════════════════════════════════════════════════════════
 \section{Discussion}
+\label{sec:discussion}
 
 The main contribution of this work is a breast cancer ontology that was designed from the start for misinformation detection, not repurposed from a general medical knowledge base. Existing systems like FAITH and CER rely on broad KGs that do not encode the kind of subtype-specific reasoning breast cancer requires: knowing which drugs work for which molecular subtypes, which treatments are actually contraindicated rather than merely unsupported, and how to handle partial truths.
 
