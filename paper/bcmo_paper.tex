@@ -39,7 +39,14 @@
 \begin{center}
     {\Large\bfseries BCMO: A Data-Grounded Breast Cancer Ontology \\[2pt]
     for Misinformation Detection from MedQuAD}\\[6pt]
-    {\normalsize Meharry Medical College, NLP Course Project \hfill October 2026}
+    {\normalsize
+        M. McDonald,
+        N. Whittenbarger,
+        and M. Senthilkumar}\\[3pt]
+    {\small Department of Biomedical Data Science, School of Applied Computational Sciences\\
+    Meharry Medical College, Nashville, TN, United States}\\[2pt]
+    {\small \{mmcdonald24, nwhittenbarger23, msenthilkuma24\}@mmc.edu}\\[6pt]
+    {\normalsize NLP Course Project \hfill October 2026}
 \end{center}
 \vspace{2pt}
 \hrule
@@ -55,11 +62,15 @@ Online patient forums and AI chatbots have become go-to resources for breast can
 
 A growing number of breast cancer patients turn to the internet, including forums, social media groups, and AI chatbots, to understand their diagnosis before, during, and after treatment. The trouble is that these spaces are full of claims that range from mildly misleading to outright dangerous. Some misinformation is obvious (``bras cause breast cancer''), but much of it is subtler: a patient might say ``since my tumor is HER2-positive, chemotherapy won't help me,'' which sounds reasonable on the surface but is clinically wrong. Chemotherapy remains a standard part of HER2-positive treatment; targeted drugs like Trastuzumab are given \textit{on top of} chemo, not instead of it.
 
-LLMs, for all their fluency, are unreliable gatekeepers here. They draw on parametric knowledge that can be stale or simply incorrect, and when prompted to be more cautious they tend to flag even harmless questions as potentially wrong. The Cancer-Myth benchmark, 585 cancer questions containing false presuppositions, shows that even the best models stumble on exactly these kinds of nuanced cases.
+The stakes are higher in breast cancer than in many other health topics. Breast cancer is not one disease but several molecular subtypes, defined by hormone receptor and HER2 status, and the right treatment depends heavily on which subtype a patient has. A belief that is true for one subtype can be false, or even harmful, for another. A patient with triple-negative breast cancer (TNBC) who reads that ``hormone therapy works for breast cancer'' may expect a benefit that her tumor biology rules out. Misinformation of this kind rarely announces itself. It usually takes the form of an overgeneralization, a half-truth, or a false premise built into an otherwise reasonable question.
 
-Several recent projects have tried to ground LLM outputs in structured medical knowledge. FAITH~\cite{zhou2026faith} decomposes model responses into atomic claims and checks them against a knowledge graph. CER~\cite{barone2025cer} retrieves published evidence to back up or refute biomedical assertions. MedGraphRAG~\cite{wu2024medgraphrag} links documents to controlled vocabularies for traceable answers. These are promising directions, but they all rely on general-purpose medical knowledge bases that were never designed with breast cancer misinformation in mind. They lack the kind of domain-specific reasoning that matters most: knowing that endocrine therapy is pointless for triple-negative tumors (which have no hormone receptors to target), or that a ``Stage IIIA'' label means something very different from ``metastatic.''
+LLMs, for all their fluency, are unreliable gatekeepers here. They answer from parametric knowledge that can be stale or simply incorrect, and they offer no record of where an answer came from. They are also easily led by the framing of a question: when a patient asks ``since I'm HER2-positive, why bother with chemo?'', a model may answer the question as asked rather than challenge its false premise. Studies of medical sycophancy find that models often abandon correct answers when users push back~\cite{ping2026sycophancy}, and that a misconception accepted early in a multi-turn conversation tends to carry through later answers~\cite{munnangi2026threadmedqa}. Domain-specific fine-tuning is not a reliable fix either: medically adapted LLMs often fail to improve on their general-purpose base models~\cite{jeong2024limited}.
 
-BCMO was built to fill that gap. Section~\ref{sec:gap} sets out the specific gaps in prior work, what MedQuAD can and cannot contribute, and the contributions of this paper.
+A promising alternative is to check claims against structured medical knowledge instead of trusting the model's memory. FAITH~\cite{zhou2026faith} decomposes model responses into atomic claims and checks them against a knowledge graph. CER~\cite{barone2025cer} retrieves published evidence to back up or refute biomedical assertions. MedGraphRAG~\cite{wu2024medgraphrag} links documents to controlled vocabularies for traceable answers, and ANCHOR-RE~\cite{ming2026anchor} shows that ontology constraints make LLM outputs more reliable without any fine-tuning. These are promising directions, but they all rely on general-purpose medical knowledge bases that were never designed with breast cancer misinformation in mind. They lack the kind of domain-specific reasoning that matters most: knowing that endocrine therapy is pointless for triple-negative tumors (which have no hormone receptors to target), or that a ``Stage IIIA'' label means something very different from ``metastatic.''
+
+In this paper we build the Breast Cancer Misinformation Ontology (BCMO), a knowledge base designed specifically for verifying breast cancer claims. Its factual core is mined from MedQuAD~\cite{benabacha2019}, a collection of question-answer pairs written by NIH institutes, so each MedQuAD-derived fact can be traced to the document and question it came from. To verify a statement, BCMO represents it as a subject--relation--object triple and checks that triple against the ontology. The HER2 example above, for instance, becomes the triple (Chemotherapy, \texttt{treats}, HER2-positive breast cancer), which BCMO marks as \emph{supported}, noting that chemotherapy is given together with HER2-targeted therapy. The claim that endocrine therapy treats TNBC is marked \emph{contradicted}, because the ontology records an explicit contraindication and the reason for it. Rather than a binary true/false label, every claim receives one of four verdicts (supported, contradicted, unsupported, or misleading), so that partial truths can be distinguished from outright falsehoods and from claims the ontology simply does not cover.
+
+The rest of the paper is organized as follows. Section~\ref{sec:gap} sets out the specific gaps in prior work, what MedQuAD can and cannot contribute, and our contributions. Section~\ref{sec:method} describes how we filtered MedQuAD, extracted concepts and relations, and built the verification engine. Section~\ref{sec:results} reports the resulting ontology and example verifications, and Section~\ref{sec:discussion} discusses limitations and next steps.
 
 % ══════════════════════════════════════════════════════════
 \section{Research Gap and Contributions}
@@ -94,6 +105,7 @@ MedQuAD has three limits that shape our claims. First, it contains \emph{no misi
 
 % ══════════════════════════════════════════════════════════
 \section{Method}
+\label{sec:method}
 
 \subsection{Data Source and Filtering}
 
@@ -291,7 +303,7 @@ There are clear limitations. Regex-based extraction misses relations that are st
 % ══════════════════════════════════════════════════════════
 \newpage
 
-\begin{thebibliography}{9}
+\begin{thebibliography}{99}
 \footnotesize
 \setlength{\itemsep}{1pt}
 \setlength{\parskip}{0pt}
@@ -330,6 +342,21 @@ arXiv:2505.24830.
 Hang, C. et al. (2025).
 TrumorGPT: Health Fact-Checking via Semantic Knowledge Graphs.
 arXiv:2505.07891.
+
+\bibitem{ping2026sycophancy}
+Ping, Q., \c{C}ar{\i}k, B., Wohn, D., Ding, Y., Wang, X., and Rho, E. (2026).
+Why LLMs Give In: Conversational Factors and Reasoning Behind Medical Sycophancy.
+arXiv:2608.01017.
+
+\bibitem{munnangi2026threadmedqa}
+Munnangi, S. and Savage, S. (2026).
+Evaluating LLMs on Misconceptions in Multi-Turn Medical Conversations.
+\textit{MLHC 2026}. arXiv:2607.12884.
+
+\bibitem{jeong2024limited}
+Jeong, M., Mani, K., Garg, S., Lipton, Z., and Oberst, M. (2024).
+The Limited Impact of Medical Adaptation of Large Language Models.
+\textit{EMNLP 2024}. arXiv:2411.08870.
 
 \bibitem{nccn2026}
 NCCN Clinical Practice Guidelines in Oncology: Breast Cancer, Version 4.2026.
