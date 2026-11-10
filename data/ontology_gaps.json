@@ -1,0 +1,205 @@
+{
+  "created": "2026-11-10T17:44:30.279719",
+  "gaps": {
+    "ali-babf88f3": {
+      "id": "ali-babf88f3",
+      "type": "alias",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Drinking alcohol has nothing to do with breast cancer."
+      ],
+      "entity": "alcohol",
+      "target_concept": "Alcohol Consumption",
+      "target_class": "RiskFactor",
+      "proposal": {
+        "action": "add_alias",
+        "concept": "Alcohol Consumption",
+        "class": "RiskFactor",
+        "alias": "alcohol"
+      },
+      "evidence_label": "lexical",
+      "merged_into": "bcmo_v2.1"
+    },
+    "rel-ac42db6f": {
+      "id": "rel-ac42db6f",
+      "type": "relation",
+      "status": "resolved",
+      "count": 1,
+      "examples": [
+        "Drinking alcohol has nothing to do with breast cancer."
+      ],
+      "subject": "Alcohol Consumption",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "proposal": null,
+      "evidence_label": "already_in_ontology"
+    },
+    "ali-97e96b9b": {
+      "id": "ali-97e96b9b",
+      "type": "alias",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Exercise lowers your chance of getting breast cancer."
+      ],
+      "entity": "exercise",
+      "target_concept": "Physical Exercise",
+      "target_class": "ProtectiveFactor",
+      "proposal": {
+        "action": "add_alias",
+        "concept": "Physical Exercise",
+        "class": "ProtectiveFactor",
+        "alias": "exercise"
+      },
+      "evidence_label": "lexical",
+      "merged_into": "bcmo_v2.1"
+    },
+    "rel-a727951e": {
+      "id": "rel-a727951e",
+      "type": "relation",
+      "status": "resolved",
+      "count": 1,
+      "examples": [
+        "Exercise lowers your chance of getting breast cancer."
+      ],
+      "subject": "Physical Exercise",
+      "relation": "decreases_risk_of",
+      "object": "Breast Cancer",
+      "proposal": null,
+      "evidence_label": "already_in_ontology"
+    },
+    "ali-31ecdffe": {
+      "id": "ali-31ecdffe",
+      "type": "alias",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Herceptin is used for HER2-positive tumors."
+      ],
+      "entity": "HER2-positive",
+      "target_concept": "HER2-Positive Breast Cancer",
+      "target_class": "BreastCancerSubtype",
+      "proposal": {
+        "action": "add_alias",
+        "concept": "HER2-Positive Breast Cancer",
+        "class": "BreastCancerSubtype",
+        "alias": "HER2-positive"
+      },
+      "evidence_label": "lexical",
+      "merged_into": "bcmo_v2.1"
+    },
+    "rel-26c44d6a": {
+      "id": "rel-26c44d6a",
+      "type": "relation",
+      "status": "resolved",
+      "count": 1,
+      "examples": [
+        "Herceptin is used for HER2-positive tumors."
+      ],
+      "subject": "Trastuzumab",
+      "relation": "treats",
+      "object": "HER2-Positive Breast Cancer",
+      "proposal": null,
+      "evidence_label": "already_in_ontology"
+    },
+    "con-e323ecaf": {
+      "id": "con-e323ecaf",
+      "type": "concept",
+      "status": "proposed",
+      "count": 1,
+      "examples": [
+        "High-dose vitamin C cures breast cancer."
+      ],
+      "entity": "vitamin C",
+      "proposal": {
+        "action": "add_concept",
+        "class": "Medication",
+        "name": "Vitamin C",
+        "needs": "class confirmation and UMLS CUI / NCI code"
+      },
+      "evidence_label": "unverifiable"
+    },
+    "rel-38be14fd": {
+      "id": "rel-38be14fd",
+      "type": "relation",
+      "status": "open",
+      "count": 1,
+      "examples": [
+        "High-dose vitamin C cures breast cancer."
+      ],
+      "subject": "vitamin C",
+      "relation": "treats",
+      "object": "Breast Cancer",
+      "blocked_by_entity_gap": true,
+      "proposal": null,
+      "evidence_label": "blocked_by_entity_gap"
+    },
+    "con-ac49d587": {
+      "id": "con-ac49d587",
+      "type": "concept",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Wearing an underwire bra causes breast cancer."
+      ],
+      "entity": "underwire bra",
+      "proposal": {
+        "action": "add_concept",
+        "class": "MisinformationTopic",
+        "name": "Underwire Bra",
+        "misinformation_claim": "Underwire bras cause breast cancer",
+        "source": "American Cancer Society"
+      },
+      "evidence_label": "known_misinformation",
+      "merged_into": "bcmo_v2.1"
+    },
+    "rel-3a41fe77": {
+      "id": "rel-3a41fe77",
+      "type": "relation",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Wearing an underwire bra causes breast cancer."
+      ],
+      "subject": "Underwire Bra",
+      "relation": "causes",
+      "object": "Breast Cancer",
+      "proposal": {
+        "action": "add_relation",
+        "subject": "Underwire Bra",
+        "relation": "causes",
+        "object": "Breast Cancer",
+        "negated": true,
+        "source": "American Cancer Society",
+        "source_doc": null,
+        "source_qa": null
+      },
+      "evidence_label": "contradicted",
+      "evidence": [
+        {
+          "sentence": "No scientific evidence links bra type to breast cancer risk",
+          "negated": true,
+          "source": "American Cancer Society"
+        }
+      ],
+      "merged_into": "bcmo_v2.1"
+    },
+    "rel-b8b5424e": {
+      "id": "rel-b8b5424e",
+      "type": "relation",
+      "status": "proposed",
+      "count": 1,
+      "examples": [
+        "Radiation is used after lumpectomy for DCIS."
+      ],
+      "subject": "Radiation Therapy",
+      "relation": "treats",
+      "object": "Ductal Carcinoma In Situ",
+      "evidence": [],
+      "evidence_label": "unverifiable",
+      "proposal": null
+    }
+  },
+  "updated": "2026-11-10T17:44:30.382547"
+}
