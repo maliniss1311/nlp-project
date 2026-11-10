@@ -6,3 +6,8 @@ __pycache__/
 
 # External dataset (separate git repo)
 MedQuAD/
+
+# Other NLP coursework (not part of the BCMO project)
+assignment/
+nlp_trigrams_embeddings_*
+ideas_papers.pdf
