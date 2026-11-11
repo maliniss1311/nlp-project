@@ -1,0 +1,154 @@
+{
+  "created": "2026-11-10T18:03:35.742873",
+  "gaps": {
+    "con-8289b549": {
+      "id": "con-8289b549",
+      "type": "concept",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Deodorant causes breast cancer, so I stopped using it."
+      ],
+      "entity": "deodorant",
+      "proposal": {
+        "action": "add_concept",
+        "class": "MisinformationTopic",
+        "name": "Deodorant",
+        "misinformation_claim": "Deodorant/antiperspirant causes breast cancer",
+        "source": "National Cancer Institute"
+      },
+      "evidence_label": "known_misinformation",
+      "merged_into": "bcmo_v2.2"
+    },
+    "rel-a2520e41": {
+      "id": "rel-a2520e41",
+      "type": "relation",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Deodorant causes breast cancer, so I stopped using it."
+      ],
+      "subject": "Deodorant",
+      "relation": "causes",
+      "object": "Breast Cancer",
+      "proposal": {
+        "action": "add_relation",
+        "subject": "Deodorant",
+        "relation": "causes",
+        "object": "Breast Cancer",
+        "negated": true,
+        "source": "National Cancer Institute",
+        "source_doc": null,
+        "source_qa": null
+      },
+      "evidence_label": "contradicted",
+      "evidence": [
+        {
+          "sentence": "No conclusive evidence links deodorant use to breast cancer",
+          "negated": true,
+          "source": "National Cancer Institute"
+        }
+      ],
+      "merged_into": "bcmo_v2.2"
+    },
+    "con-c4289e7b": {
+      "id": "con-c4289e7b",
+      "type": "concept",
+      "status": "proposed",
+      "count": 1,
+      "examples": [
+        "Turmeric cures breast cancer better than chemo."
+      ],
+      "entity": "turmeric",
+      "proposal": {
+        "action": "add_concept",
+        "class": null,
+        "name": "Turmeric",
+        "needs": "class confirmation and UMLS CUI / NCI code"
+      },
+      "evidence_label": "unverifiable"
+    },
+    "rel-2af56689": {
+      "id": "rel-2af56689",
+      "type": "relation",
+      "status": "open",
+      "count": 1,
+      "examples": [
+        "Turmeric cures breast cancer better than chemo."
+      ],
+      "subject": "turmeric",
+      "relation": "treats",
+      "object": "Breast Cancer",
+      "blocked_by_entity_gap": true,
+      "proposal": null,
+      "evidence_label": "blocked_by_entity_gap"
+    },
+    "con-4808d65f": {
+      "id": "con-4808d65f",
+      "type": "concept",
+      "status": "proposed",
+      "count": 1,
+      "examples": [
+        "Abortion increases the risk of breast cancer."
+      ],
+      "entity": "abortion",
+      "proposal": {
+        "action": "add_concept",
+        "class": null,
+        "name": "Abortion",
+        "needs": "class confirmation and UMLS CUI / NCI code"
+      },
+      "evidence_label": "unverifiable"
+    },
+    "rel-57bc0eaf": {
+      "id": "rel-57bc0eaf",
+      "type": "relation",
+      "status": "open",
+      "count": 1,
+      "examples": [
+        "Abortion increases the risk of breast cancer."
+      ],
+      "subject": "abortion",
+      "relation": "increases_risk_of",
+      "object": "Breast Cancer",
+      "blocked_by_entity_gap": true,
+      "proposal": null,
+      "evidence_label": "blocked_by_entity_gap"
+    },
+    "con-ada15bd1": {
+      "id": "con-ada15bd1",
+      "type": "concept",
+      "status": "merged",
+      "count": 1,
+      "examples": [
+        "Sugar feeds cancer cells and causes breast cancer."
+      ],
+      "entity": "sugar",
+      "proposal": {
+        "action": "add_concept",
+        "class": "MisinformationTopic",
+        "name": "Sugar",
+        "misinformation_claim": "Sugar feeds cancer and you should eliminate it",
+        "source": "Mayo Clinic"
+      },
+      "evidence_label": "known_misinformation",
+      "merged_into": "bcmo_v2.2"
+    },
+    "rel-e070f1aa": {
+      "id": "rel-e070f1aa",
+      "type": "relation",
+      "status": "proposed",
+      "count": 1,
+      "examples": [
+        "Sugar feeds cancer cells and causes breast cancer."
+      ],
+      "subject": "Sugar",
+      "relation": "causes",
+      "object": "Breast Cancer",
+      "proposal": null,
+      "evidence_label": "unverifiable",
+      "evidence": []
+    }
+  },
+  "updated": "2026-11-10T18:03:35.797459"
+}

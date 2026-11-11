@@ -61,6 +61,70 @@ Without this step, all three end up as `unsupported`. That verdict mixes up "the
 
 > Caveat: the 8 claims are a hand-built pilot chosen to exercise each gap type. The numbers show the mechanism works. They are **not** an estimate of real-world coverage. That requires the evaluation set (§4).
 
+## 3b. Example: gap filling on 12 patient statements (BCMO v2.1 → v2.2)
+
+A second, independent example uses realistic patient wording and runs the full pipeline from raw text.
+
+- Inputs: `data/examples/patient_statements.txt` (raw sentences) and `data/examples/patient_claims_gold.json` (hand-annotated gold triples for the same sentences).
+- Outputs: `data/examples/example_gaps.json` and `data/bcmo_v2.2.json`.
+
+Each statement was run two ways, which separates **ontology gaps** from **claim-extraction errors**:
+
+- **Gold triples:** this isolates the ontology.
+- **Rule-based `ClaimExtractor` on raw text:** this tests the pipeline end to end.
+
+### Per-claim results (gold triples)
+
+| Patient statement | Truth | v2.1 verdict | v2.2 verdict | Gap → action |
+|---|---|---|---|---|
+| "My aunt says drinking alcohol has nothing to do with breast cancer." | myth | contradicted | contradicted | none (alias added in v2.1) ✔ |
+| "I read that tamoxifen causes hot flashes." | true | supported | supported | none ✔ |
+| "Deodorant causes breast cancer, so I stopped using it." | myth | unsupported (unlinked) | **contradicted** | Concept: new `MisinformationTopic` "Deodorant"; negated triple sourced from the NCI entry in the myth list |
+| "Breastfeeding reduces the risk of breast cancer." | true | supported | supported | none ✔ |
+| "My doctor said chemotherapy causes hair loss." | true | supported | supported | none ✔ |
+| "Mammograms can detect breast cancer early." | true | supported | supported | none ✔ |
+| "Turmeric cures breast cancer better than chemo." | myth | unsupported (unlinked) | unsupported | Concept gap, **missed link**: should map to the myth "Natural remedies can cure breast cancer", but token matching can't infer that turmeric is a natural remedy |
+| "Being overweight increases the risk of breast cancer." | true | supported | supported | none ✔ |
+| "Herceptin treats HER2-positive breast cancer." | true | supported | supported | none ✔ |
+| "Abortion increases the risk of breast cancer." | myth | unsupported (unlinked) | unsupported | **True coverage gap**: a well-known myth that is absent from BCMO and MedQuAD. Needs an expert source (ACS/NCI) |
+| "Regular exercise lowers the risk of breast cancer." | true | supported | supported | none ✔ |
+| "Sugar feeds cancer cells and causes breast cancer." | misleading | unsupported (unlinked) | unsupported | Concept "Sugar" added, but its myth entry is labelled `misleading`, and the tool only turns `false` myths into contradictions, so no verdict is produced |
+
+**Coverage (gold triples):**
+
+| Metric | v2.1 | v2.2 |
+|---|---|---|
+| Entities linked | 20/24 | 22/24 |
+| Claims with a verdict | 8/12 | 9/12 |
+| Misinformation recall (5 myths) | 1/5 | 2/5 |
+| Wrong verdicts | 0 | 0 |
+
+> Note: for negated claims ("…has nothing to do with…"), the verdict was flipped in the evaluation step: a supported triple plus `negated=True` gives *contradicted*. `verify_claim` does not apply the claim's negation flag yet, so it should be updated to do this.
+>
+> To reproduce this run, call the `gap_filler` functions on the two example files, with `GAPS_PATH` pointed at `data/examples/example_gaps.json` and base version `bcmo_v2.1.json`.
+
+### End-to-end (raw text through the rule-based extractor)
+
+The extractor produced 9 triples from 12 sentences. Every one of those 9 linked to BCMO (18/18 entities), and 8 got a verdict. The errors happen *before* the ontology is reached:
+
+- **5 sentences produced no claim at all:** deodorant, mammograms, overweight, abortion, sugar. The rule patterns don't cover "X causes Y" or "can detect" phrasings.
+- **"Turmeric cures breast cancer better than chemo"** was extracted as *(chemo, treats, breast cancer)*. The ontology correctly *supports* that triple, so a misinformation sentence comes out labelled **supported**. This is the most dangerous failure in the run, and it is caused by extraction.
+- **"Alcohol has nothing to do with breast cancer"** was extracted as *(breast cancer, associated_with, alcohol)* with no negation, so the denial is lost and the myth gets **supported**.
+
+### What the example shows
+
+1. **When the ontology answers, it was right.** It gave 0 wrong verdicts on gold triples. The remaining problem is coverage, not correctness. This is the "precise but incomplete" pattern from §4.4.
+2. **Myth coverage is the weak spot.** 3 of the 5 myths failed, each for a different reason:
+   - turmeric is missing an is-a link to "natural remedy";
+   - abortion is missing from the ontology entirely;
+   - sugar's `misleading` verdict isn't mapped to anything.
+
+   Concrete fixes:
+   - add `is_a` links (e.g. Turmeric → Natural Remedy);
+   - add expert-sourced myths such as abortion;
+   - map `misleading` myth entries to the `misleading` verdict.
+3. **In the end-to-end pipeline, extraction is the bottleneck.** Both wrong labels came from the extractor. The study therefore has to report extraction errors separately from ontology errors (§4.2, gap-attributed error rate). Otherwise, extraction failures would be wrongly counted against the ontology hypothesis.
+
 ## 4. Using gaps to test whether the ontology works
 
 The central hypothesis is that explicit ontology grounding beats LLM-only and RAG. Gap analysis turns this into a falsifiable test. If grounding helps, its errors should be concentrated in identifiable, fixable gaps, and fixing those gaps should improve accuracy without hurting precision.

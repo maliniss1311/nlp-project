@@ -1,0 +1,14 @@
+[
+ {"subject":"alcohol","relation":"increases_risk_of","object":"breast cancer","negated":true,"source_text":"My aunt says drinking alcohol has nothing to do with breast cancer."},
+ {"subject":"tamoxifen","relation":"has_side_effect","object":"hot flashes","source_text":"I read that tamoxifen causes hot flashes."},
+ {"subject":"deodorant","relation":"causes","object":"breast cancer","source_text":"Deodorant causes breast cancer, so I stopped using it."},
+ {"subject":"breastfeeding","relation":"decreases_risk_of","object":"breast cancer","source_text":"Breastfeeding reduces the risk of breast cancer."},
+ {"subject":"chemotherapy","relation":"has_side_effect","object":"hair loss","source_text":"My doctor said chemotherapy causes hair loss."},
+ {"subject":"mammograms","relation":"detects","object":"breast cancer","source_text":"Mammograms can detect breast cancer early."},
+ {"subject":"turmeric","relation":"treats","object":"breast cancer","source_text":"Turmeric cures breast cancer better than chemo."},
+ {"subject":"overweight","relation":"increases_risk_of","object":"breast cancer","source_text":"Being overweight increases the risk of breast cancer."},
+ {"subject":"herceptin","relation":"treats","object":"HER2-positive breast cancer","source_text":"Herceptin treats HER2-positive breast cancer."},
+ {"subject":"abortion","relation":"increases_risk_of","object":"breast cancer","source_text":"Abortion increases the risk of breast cancer."},
+ {"subject":"regular exercise","relation":"decreases_risk_of","object":"breast cancer","source_text":"Regular exercise lowers the risk of breast cancer."},
+ {"subject":"sugar","relation":"causes","object":"breast cancer","source_text":"Sugar feeds cancer cells and causes breast cancer."}
+]
