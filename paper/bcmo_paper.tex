@@ -300,6 +300,21 @@ Pulling from 6 MedQuAD subsets rather than just CancerGov turned out to matter q
 
 There are clear limitations. Regex-based extraction misses relations that are stated in complex or roundabout ways. The misinformation matcher relies on word overlap, which will not catch paraphrases that use very different vocabulary to express the same false idea. And the ontology currently has no mechanism for handling temporal changes in guidelines (a treatment that was experimental in 2020 may be standard of care today). In future work we plan to swap in an LLM-based extractor for the regex layer, test BCMO against the full CancerMyth benchmark and expert-annotated Reddit data, and run head-to-head comparisons of ontology-grounded verification against LLM-only and RAG-based baselines.
 
+\subsection{Future Expansion: BCMO as a Graph Database}
+\label{sec:future-graph}
+
+BCMO is already a knowledge graph in structure: concept instances are nodes, the 14 typed relations are edges, and provenance, negation, and certainty are edge attributes. It is currently stored as JSON and queried in Python. A natural expansion of this study is to load BCMO into a property-graph database such as Neo4j, while keeping the versioned JSON file as the single source of truth. A loader script would rebuild the graph after each ontology release. Each concept class would become a node label (e.g.\ \texttt{(:Medication \{name:"Trastuzumab"\})}), each relation type would become an edge type carrying its source and evidence (e.g.\ \texttt{-[:TREATS \{source:"HERA trial"\}]->}), and curated myths would become first-class nodes linked to the concepts they concern. This would enable several things the current representation cannot do easily:
+
+\begin{itemize}[leftmargin=*,itemsep=1pt,topsep=2pt]
+  \item \textbf{Hierarchical and multi-hop reasoning.} Adding \texttt{IS\_A} edges (e.g.\ Turmeric $\rightarrow$ Natural Remedy, HER2-Positive Breast Cancer $\rightarrow$ Breast Cancer) lets a claim about a specific entity inherit evidence from its parent. In preliminary gap analysis on patient-style claims we observed exactly this failure: a claim that turmeric cures breast cancer could not be linked to the curated myth that natural remedies cure breast cancer.
+  \item \textbf{Path-based explanations.} Verification becomes a graph query, so the system can return the exact path and its sources as the justification for a verdict. This makes explanations directly checkable against their supporting evidence.
+  \item \textbf{Structural quality checks.} Concepts that participate in no relation, relation endpoints that are not defined concepts, and domain/range violations can each be found with a single query, and can be tracked across ontology versions.
+  \item \textbf{Scaling to standard vocabularies.} A graph backend makes it practical to link BCMO nodes to UMLS, NCI Thesaurus, or SNOMED CT concepts and import selected neighborhoods, without changing the verification interface.
+  \item \textbf{Visualization.} Subgraphs around a myth or treatment can be inspected interactively and used to communicate ontology coverage to clinical collaborators.
+\end{itemize}
+
+At BCMO's current size, a graph database is not needed for performance. Its value lies in richer structure and querying, and it adds a running database as a dependency for reproducibility. We therefore propose it as an optional backend, with lightweight alternatives (an in-memory graph library, or an RDF/OWL encoding for formal reasoning) left open for comparison.
+
 % ══════════════════════════════════════════════════════════
 \newpage
 
