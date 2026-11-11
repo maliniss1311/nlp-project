@@ -109,7 +109,7 @@ The extractor produced 9 triples from 12 sentences. Every one of those 9 linked 
 
 - **5 sentences produced no claim at all:** deodorant, mammograms, overweight, abortion, sugar. The rule patterns don't cover "X causes Y" or "can detect" phrasings.
 - **"Turmeric cures breast cancer better than chemo"** was extracted as *(chemo, treats, breast cancer)*. The ontology correctly *supports* that triple, so a misinformation sentence comes out labelled **supported**. This is the most dangerous failure in the run, and it is caused by extraction.
-- **"Alcohol has nothing to do with breast cancer"** was extracted as *(breast cancer, associated_with, alcohol)* with no negation, so the denial is lost and the myth gets **supported**.
+- **"Alcohol has nothing to do with breast cancer"** was extracted as *(breast cancer, associated_with, alcohol)*: the direction is reversed and there is no negation. No such triple exists, so the verdict is **unsupported**. The ontology does know this myth: from the gold triple it gets *contradicted*. The extractor's error turns that into no verdict.
 
 ### What the example shows
 
@@ -123,7 +123,9 @@ The extractor produced 9 triples from 12 sentences. Every one of those 9 linked 
    - add `is_a` links (e.g. Turmeric → Natural Remedy);
    - add expert-sourced myths such as abortion;
    - map `misleading` myth entries to the `misleading` verdict.
-3. **In the end-to-end pipeline, extraction is the bottleneck.** Both wrong labels came from the extractor. The study therefore has to report extraction errors separately from ontology errors (§4.2, gap-attributed error rate). Otherwise, extraction failures would be wrongly counted against the ontology hypothesis.
+3. **In the end-to-end pipeline, extraction is the bottleneck.** The only wrong label (turmeric → *supported*) and the lost alcohol verdict both came from the extractor, as did the 5 sentences that produced no claim. The study therefore has to report extraction errors separately from ontology errors (§4.2, gap-attributed error rate). Otherwise, extraction failures would be wrongly counted against the ontology hypothesis.
+
+Notebook with all results and a verdict chart: `notebooks/bcmo_gap_example.ipynb`.
 
 ## 4. Using gaps to test whether the ontology works
 
