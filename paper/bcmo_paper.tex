@@ -40,9 +40,9 @@
     {\Large\bfseries BCMO: A Data-Grounded Breast Cancer Ontology \\[2pt]
     for Misinformation Detection from MedQuAD}\\[6pt]
     {\normalsize
-        M. McDonald,
-        N. Whittenbarger,
-        and M. Senthilkumar}\\[3pt]
+        Micaiah McDonald,
+        Noah Whittenbarger,
+        and Malini Senthilkumar}\\[3pt]
     {\small Department of Biomedical Data Science, School of Applied Computational Sciences\\
     Meharry Medical College, Nashville, TN, United States}\\[2pt]
     {\small \{mmcdonald24, nwhittenbarger23, msenthilkuma24\}@mmc.edu}\\[6pt]
@@ -55,7 +55,7 @@
 % ══════════════════════════════════════════════════════════
 \section{Abstract}
 
-Online patient forums and AI chatbots have become go-to resources for breast cancer information, but they are also breeding grounds for medical misinformation. Current large language models (LLMs) are poorly equipped to catch the kinds of half-truths and false presuppositions that show up in real patient conversations. In this paper we describe the construction of the Breast Cancer Misinformation Ontology (BCMO v2.0), a specialized knowledge base built from the ground up using the MedQuAD medical question-answering dataset alongside clinician-reviewed guidelines. We parsed 43 breast-cancer-specific documents drawn from 6 MedQuAD subsets and pulled out 118 normalized medical concepts and 98 factual relations directly from the text. These were then combined with 55 additional relations curated from NCCN treatment guidelines and the NCI Thesaurus. The finished ontology spans 15 concept classes, 168 instances, 14 relation types, and 136 total factual relations, each tagged with its origin (60\% from MedQuAD, 40\% expert-added). Rather than returning a simple true-or-false answer, BCMO supports a four-way verdict system (supported, contradicted, unsupported, or misleading), giving downstream applications the nuance they need to handle tricky cases like partial truths and outdated advice.
+Online patient forums and AI chatbots have become go-to resources for breast cancer information, but they are also breeding grounds for medical misinformation. Current large language models (LLMs) are poorly equipped to catch the kinds of half-truths and false presuppositions that show up in real patient conversations. In this paper, we describe the construction of the Breast Cancer Misinformation Ontology (BCMO v2.0), a specialized knowledge base built from the ground up using the MedQuAD medical question-answering dataset alongside clinician-reviewed guidelines. We parsed 43 breast-cancer-specific documents from 6 MedQuAD subsets and extracted 118 normalized medical concepts and 98 factual relations directly from the text. These were then combined with 55 additional relations curated from NCCN treatment guidelines and the NCI Thesaurus. The finished ontology spans 15 concept classes, 168 instances, 14 relation types, and 136 total factual relations, each tagged with its origin (60\% from MedQuAD, 40\% expert-added). Rather than returning a simple true-or-false answer, BCMO supports a four-way verdict system (supported, contradicted, unsupported, or misleading), giving downstream applications the nuance they need to handle tricky cases like partial truths and outdated advice.
 
 % ══════════════════════════════════════════════════════════
 \section{Introduction}
